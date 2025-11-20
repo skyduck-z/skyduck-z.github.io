@@ -15,9 +15,9 @@
     <atom:link href="https://duck-dd.github.io/categories/cs/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>MCMF from scratch</title>
-      <link>https://duck-dd.github.io/posts/mcmf/</link>
+      <link>https://duck-dd.github.io/posts/2025-06-24-mcmf/</link>
       <pubDate>Tue, 24 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/mcmf/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-06-24-mcmf/</guid>
       <description>&lt;p&gt;需要深度用到MCMF了，但是摸了摸自己的脑门，脑子里没有公式和演算，只剩几个概念了。
 记录一下我从使用的角度理解MCMF问题(东拼西凑)的过程；某些定理的推导，或者复杂度的计算原理，不会深扒；顺便说个感悟，在feed如此丰富的今天，我们还是应该时刻锻炼传统手艺，保留信息检索、过滤、沉淀的能力，否则可能会越走越远(挺简单个问题一开始看偏了太难理解了)。&lt;/p&gt;
 &lt;h1 id=&#34;mcmf概念&#34;&gt;MCMF概念&lt;/h1&gt;
@@ -58,9 +58,9 @@
     </item>
     <item>
       <title>The Shortest Path</title>
-      <link>https://duck-dd.github.io/posts/shortest-path/</link>
+      <link>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</link>
       <pubDate>Mon, 23 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/shortest-path/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</guid>
       <description>&lt;h1 id=&#34;最短路径问题&#34;&gt;最短路径问题&lt;/h1&gt;
 &lt;p&gt;寻找有向图中两个顶点之间的路径，使得 &lt;code&gt;路径最短&lt;/code&gt; 或 &lt;code&gt;路径上各边的权重之和最小&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;1-无权图最短路径&#34;&gt;1 无权图最短路径&lt;/h2&gt;
@@ -114,9 +114,9 @@
     </item>
     <item>
       <title>go tips(持续更新)</title>
-      <link>https://duck-dd.github.io/posts/go-tips/</link>
+      <link>https://duck-dd.github.io/posts/2025-06-22-go-tips/</link>
       <pubDate>Sun, 22 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/go-tips/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-06-22-go-tips/</guid>
       <description>&lt;p&gt;有很多从其他大佬的总结中抄来的，不注明出处了&lt;/p&gt;
 &lt;p&gt;会记录一些:&lt;/p&gt;
 &lt;ul&gt;
@@ -180,9 +180,9 @@ func main() {
     </item>
     <item>
       <title>相似度</title>
-      <link>https://duck-dd.github.io/posts/%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
+      <link>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
       <pubDate>Tue, 03 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
       <description>&lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;用于衡量多个对象（如文本、数值向量、图像、序列等）之间相似程度的数学方法。&lt;/p&gt;
 &lt;p&gt;在计算机领域，通常将 “相似性” 转化为可计算的数值（例如 0~1 表示，1代表完全相似，0代表完全不相似）。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;的应用十分广泛，例如推荐系统（如商品/内容推荐）、数据挖掘（如聚类、分类）、NLP（如文本查重、语义匹配）、图像识别等。&lt;/p&gt;
@@ -334,9 +334,9 @@ or 向量间欧式距离
     </item>
     <item>
       <title>golang singleflight</title>
-      <link>https://duck-dd.github.io/posts/golang-singleflight/</link>
+      <link>https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/</link>
       <pubDate>Sat, 05 Apr 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/golang-singleflight/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/</guid>
       <description>&lt;p&gt;高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。&lt;/p&gt;
 &lt;p&gt;通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：&lt;code&gt;golang.org/x/sync/singleflight&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;如下面的例子，&lt;code&gt;doSth&lt;/code&gt;有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起&lt;code&gt;doSth&lt;/code&gt;的&lt;code&gt;index&lt;/code&gt;是可控的，然后我们看到输出实际&lt;code&gt;doSth&lt;/code&gt;只执行了一次，所有routine共享了同一份结果。
@@ -414,9 +414,9 @@ index:1, ret:result_100, shared:true, err:&amp;lt;nil&amp;gt;
     </item>
     <item>
       <title>软件架构设计原则</title>
-      <link>https://duck-dd.github.io/posts/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</link>
+      <link>https://duck-dd.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</link>
       <pubDate>Sun, 16 Apr 2023 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</guid>
+      <guid>https://duck-dd.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</guid>
       <description>&lt;p&gt;每次接手一些老旧系统，总是很头疼，最近想，会不会别人接手了我的系统以后也是一样的感受，想到可能有人每天都在吐槽(骂)我头皮发麻啊&amp;hellip;&lt;/p&gt;
 &lt;p&gt;知易行难，其实怎么做好一个后端服务大家都是门清的，只是受限于 &lt;code&gt;排期&lt;/code&gt; &lt;code&gt;业务价值&lt;/code&gt; &lt;code&gt;协作&lt;/code&gt; 等太多因素，往往事与愿违。只能说但行好事莫问前程吧，下面再把这些原则列一下，时刻提醒自己吧；以下原则从个人角度分先后，不是说有重要性区别，而是有些原则很高频，或者很容易被忽略，需要时刻牢记。&lt;/p&gt;
 &lt;h1 id=&#34;一-职责逻辑-清晰&#34;&gt;一 职责/逻辑 清晰&lt;/h1&gt;
@@ -454,9 +454,9 @@ index:1, ret:result_100, shared:true, err:&amp;lt;nil&amp;gt;
     </item>
     <item>
       <title>golang select case机会均等</title>
-      <link>https://duck-dd.github.io/posts/golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</link>
+      <link>https://duck-dd.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</link>
       <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</guid>
+      <guid>https://duck-dd.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</guid>
       <description>&lt;h1 id=&#34;验证&#34;&gt;验证&lt;/h1&gt;
 &lt;p&gt;我们每天都在使用下面这样的用法，对于这种多条件分支判定，我们从来不会指定权重，按固有思维，多条件间应该是机会均等的，那么golang如何做的呢？&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;select {
@@ -512,9 +512,9 @@ sum:  23369 25833 30798
     </item>
     <item>
       <title>Golang schedule</title>
-      <link>https://duck-dd.github.io/posts/go-schedule/</link>
+      <link>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</link>
       <pubDate>Sat, 21 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/go-schedule/</guid>
+      <guid>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</guid>
       <description>&lt;h2 id=&#34;写在前面&#34;&gt;写在前面&lt;/h2&gt;
 &lt;p&gt;runtime包实现了所有&lt;code&gt;goroutine scheduler&lt;/code&gt;、&lt;code&gt;memory allocator&lt;/code&gt;、&lt;code&gt;garbage collector&lt;/code&gt;细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。&lt;/p&gt;
 &lt;p&gt;搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM-&amp;gt;GMP演化后的材料。&lt;/p&gt;
@@ -869,19 +869,19 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
     </item>
     <item>
       <title>happens-before</title>
-      <link>https://duck-dd.github.io/posts/happens-before/</link>
+      <link>https://duck-dd.github.io/posts/2021-08-19-happens-before/</link>
       <pubDate>Thu, 19 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/happens-before/</guid>
+      <guid>https://duck-dd.github.io/posts/2021-08-19-happens-before/</guid>
       <description>&lt;p&gt;在并发系统中，用于描述事件执行顺序关系；若事件A &amp;ldquo;happens-before&amp;rdquo; 事件B，则A的执行结果对B可见，且A在逻辑上先于B执行(并不要求在物理时间上A必须先于B执行)。&lt;/p&gt;
 &lt;p&gt;所以这其实是一种逻辑关系，在并发系统中，P1 P2 两个过程在逻辑上&amp;quot;同时&amp;quot;在执行，P2过程中的事件B依赖P1过程中的事件A的结果，那么就需要逻辑上的 &amp;ldquo;happens-before&amp;rdquo; 来确保A&amp;amp;B间的依赖关系。&lt;/p&gt;
 &lt;p&gt;常见的并发模型 &lt;strong&gt;共享内存&lt;/strong&gt; 和 &lt;strong&gt;消息传递&lt;/strong&gt;，都遵循 &amp;ldquo;happens-before&amp;quot;逻辑，消息传递中的happens-before好理解，消息的传入肯定是在消息的接收之前的，在共享内存模型的并发中，happens-before就是帮助我们在逻辑上自洽，理清楚不同并发单元(线程 协程 等)对某一个共享内存变量的操作顺序。&lt;/p&gt;</description>
     </item>
     <item>
       <title>DNS</title>
-      <link>https://duck-dd.github.io/posts/dns/</link>
+      <link>https://duck-dd.github.io/posts/2021-05-13-dns/</link>
       <pubDate>Thu, 13 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/dns/</guid>
-      <description>&lt;h1 id=&#34;dns挺好啥是dns&#34;&gt;DNS，挺好，啥是DNS？&lt;/h1&gt;
+      <guid>https://duck-dd.github.io/posts/2021-05-13-dns/</guid>
+      <description>&lt;h1 id=&#34;dns&#34;&gt;DNS？&lt;/h1&gt;
 &lt;h2 id=&#34;一些概念&#34;&gt;一些概念&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;FQDN: Fully Qualified Domain Name，全限定域名，同时带有主机名和域名的名称（通过符号“.”），例如一个FQDN是www.baidu.com，www是主机名，baidu.com是域名。再举例，我是海淀吴彦祖，你是**吴彦祖，但是我们还知道，有个人就叫吴彦祖，这么多吴彦祖我们都没有混淆，因为名字前面加上了地域，也就是域名。从逻辑上看FQDN，就是主机名的完整表达，类似绝对路径，通过一个FQDN我们可以在全网内锁定主机位置。&lt;/li&gt;

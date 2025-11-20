@@ -15,9 +15,9 @@
     <atom:link href="https://duck-dd.github.io/tags/2021/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang schedule</title>
-      <link>https://duck-dd.github.io/posts/go-schedule/</link>
+      <link>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</link>
       <pubDate>Sat, 21 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/go-schedule/</guid>
+      <guid>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</guid>
       <description>&lt;h2 id=&#34;写在前面&#34;&gt;写在前面&lt;/h2&gt;
 &lt;p&gt;runtime包实现了所有&lt;code&gt;goroutine scheduler&lt;/code&gt;、&lt;code&gt;memory allocator&lt;/code&gt;、&lt;code&gt;garbage collector&lt;/code&gt;细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。&lt;/p&gt;
 &lt;p&gt;搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM-&amp;gt;GMP演化后的材料。&lt;/p&gt;
@@ -372,18 +372,18 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
     </item>
     <item>
       <title>happens-before</title>
-      <link>https://duck-dd.github.io/posts/happens-before/</link>
+      <link>https://duck-dd.github.io/posts/2021-08-19-happens-before/</link>
       <pubDate>Thu, 19 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/happens-before/</guid>
+      <guid>https://duck-dd.github.io/posts/2021-08-19-happens-before/</guid>
       <description>&lt;p&gt;在并发系统中，用于描述事件执行顺序关系；若事件A &amp;ldquo;happens-before&amp;rdquo; 事件B，则A的执行结果对B可见，且A在逻辑上先于B执行(并不要求在物理时间上A必须先于B执行)。&lt;/p&gt;
 &lt;p&gt;所以这其实是一种逻辑关系，在并发系统中，P1 P2 两个过程在逻辑上&amp;quot;同时&amp;quot;在执行，P2过程中的事件B依赖P1过程中的事件A的结果，那么就需要逻辑上的 &amp;ldquo;happens-before&amp;rdquo; 来确保A&amp;amp;B间的依赖关系。&lt;/p&gt;
 &lt;p&gt;常见的并发模型 &lt;strong&gt;共享内存&lt;/strong&gt; 和 &lt;strong&gt;消息传递&lt;/strong&gt;，都遵循 &amp;ldquo;happens-before&amp;quot;逻辑，消息传递中的happens-before好理解，消息的传入肯定是在消息的接收之前的，在共享内存模型的并发中，happens-before就是帮助我们在逻辑上自洽，理清楚不同并发单元(线程 协程 等)对某一个共享内存变量的操作顺序。&lt;/p&gt;</description>
     </item>
     <item>
-      <title>离职人生体验 2021-07-08日记</title>
-      <link>https://duck-dd.github.io/posts/%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C-2021-07-08%E6%97%A5%E8%AE%B0/</link>
+      <title>离职人生体验</title>
+      <link>https://duck-dd.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</link>
       <pubDate>Thu, 08 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C-2021-07-08%E6%97%A5%E8%AE%B0/</guid>
+      <guid>https://duck-dd.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</guid>
       <description>&lt;p&gt;2018年7月4日，星期三，天气晴。&lt;/p&gt;
 &lt;p&gt;早晨7点半，太阳已经很大，收拾好材料，出发，今天是上班的第一天，也是第一天上班。浑浑噩噩的流程，脑子里什么都没进，然后晕头转向的上了班车，从大厦到了科技园。找工位，认识同事，熟悉环境，然后第一天就心大的开始午睡，睡了2小时，爬起来，心想，坏了，睡过了，然后，发现并没有人关注我，呼～，长出一口气，心想社畜生活貌似还挺轻松。&lt;/p&gt;
 &lt;p&gt;leader下午快到晚饭才开完会（以至于后面很长一段时间我觉得自己菜的评判标准就是没会开，太年轻啊），找到我，“走，一块吃个晚饭”，我怀着无比的尴尬，回，“哥，我吃完了。。。（心想完了第一天就摸鱼还被发现了）”，leader说，那走吧，随便找个空会议室聊两句。“别叫哥，我们这里都不这样叫，直接叫我名字就行”，我心想，业界都传的XX有着最好的氛围，看来是真的，跟学校没什么两样哈。leader说，“BFE听过吧”，我理直气壮的回，“没啊”  （冷场大概有两秒钟吧，这里可能原本应该有十分钟左右的技术交谈，然后大概是临时取消了吧） “我是你的导师，但是平时时间不太充裕，你有问题多问问我们组的人吧，其中还有一个是你的师兄”，“好的”。本次谈话就此结束，我开始回去看材料学习，第一天到底学会了啥，完全不记得了，可能甚至大概都没搞懂BFE全称到底是啥吧。&lt;/p&gt;
@@ -402,10 +402,10 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
     </item>
     <item>
       <title>DNS</title>
-      <link>https://duck-dd.github.io/posts/dns/</link>
+      <link>https://duck-dd.github.io/posts/2021-05-13-dns/</link>
       <pubDate>Thu, 13 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/dns/</guid>
-      <description>&lt;h1 id=&#34;dns挺好啥是dns&#34;&gt;DNS，挺好，啥是DNS？&lt;/h1&gt;
+      <guid>https://duck-dd.github.io/posts/2021-05-13-dns/</guid>
+      <description>&lt;h1 id=&#34;dns&#34;&gt;DNS？&lt;/h1&gt;
 &lt;h2 id=&#34;一些概念&#34;&gt;一些概念&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;FQDN: Fully Qualified Domain Name，全限定域名，同时带有主机名和域名的名称（通过符号“.”），例如一个FQDN是www.baidu.com，www是主机名，baidu.com是域名。再举例，我是海淀吴彦祖，你是**吴彦祖，但是我们还知道，有个人就叫吴彦祖，这么多吴彦祖我们都没有混淆，因为名字前面加上了地域，也就是域名。从逻辑上看FQDN，就是主机名的完整表达，类似绝对路径，通过一个FQDN我们可以在全网内锁定主机位置。&lt;/li&gt;

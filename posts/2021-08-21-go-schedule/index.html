@@ -1,0 +1,1026 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Golang schedule | Duck</title><meta name=keywords content="Golang,2021"><meta name=description content="写在前面
+runtime包实现了所有goroutine scheduler、memory allocator、garbage collector细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。
+搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM->GMP演化后的材料。
+GM
+go1.1版本以前，调度使用GM模型，如下图所示。简单的理解GM模型，就是有一个始终执行的调度函数schedule不停的执行调度计算，当某个M的G执行完成了，调度器就把这个M放回M队列，可绑定执行其他G（如果某个M+G发生了syscall，那么本来并发度是通过M数量控制的，此时并发度就降低了？）；如果G执行过程中创建新的G，会将新的G放入到G全局可执行队列中。G全局可执行队列的操作有一把全局锁，这导致了各个M对G全局队列的操作存在严重的竞争。
+下面这段完全是我的臆测，请别太相信：
+
+简单概括呢，所以可以认为有：
+
+G全局可执行队列(以下也可能简称G可执行队列)
+M可用队列
+
+调度器要做的事就是：
+
+从G的可执行队列取G并从M的可用队列取M，将二者绑定开始执行G
+对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用
+
+
+
+那么GM模型有哪些问题呢？
+
+(重点问题)单一的全局mutex(sched.lock)和集中状态管理
+
+mutex需要保护所有与全局goroutine队列相关操作(创建、完成、重排等等)，竞争严重
+
+
+(重点问题)per-M内存(M.mcache)问题
+
+每个M都需要一个mcache，会导致资源消耗过大(每个mcache可以吸纳到2MB的内存缓存和其他缓存)
+
+举个栗子，一个陷入syscall的M并不需要使用cache，但是在全部的M中，陷入系统调用的M与执行goroutine的M的比例可能是N:1(N>>1)，这就导致了N/(N+1)比例的mcache在闲置
+
+
+数据局部性差:
+
+举个栗子，M1执行G1，此时创建了G2，G2通常是立刻进入了G全局可执行队列，而此时M1还在执行G1，所以G2通常被其他M执行，但是G1和G2通常强相关，所以G2最好也在M1上执行，因为G2对M1的缓存命中率更高
+
+
+
+
+goroutine传递问题
+
+goroutine(G)交接(G.nextg)，M之间会经常交接可运行的G
+再通俗点说，就是G空转，本来能够好好在一个M上执行完，但是由于全局队列的存在，G一旦回全局队列了，下次就不知道被哪个M取走了，所以叫“空转”；M加载G的上下文是有开销的，所以空转会导致性能下降
+
+
+频繁的线程阻塞/解阻塞
+
+syscalls情况下，线程经常被阻塞和解阻塞，增加了很多额外开销
+通俗点说，M+G syscall，M阻塞，syscall完成后，M解阻塞继续执行G（如果是通过M数量控制并发度，这是不是就导致了并发度降低？）
+
+
+
+GMP
+基于以上说的GM的问题，go1.1以后开始使用GMP调度模型。
+G、M、P的定义如下(***/src/runtime/runtime2.go)。
+type g struct {
+	// Stack parameters.
+	// stack describes the actual stack memory: [stack.lo, stack.hi).
+	// stackguard0 is the stack pointer compared in the Go stack growth prologue.
+	// It is stack.lo+StackGuard normally, but can be StackPreempt to trigger a preemption.
+	// stackguard1 is the stack pointer compared in the C stack growth prologue.
+	// It is stack.lo+StackGuard on g0 and gsignal stacks.
+	// It is ~0 on other goroutine stacks, to trigger a call to morestackc (and crash).
+	stack       stack   // offset known to runtime/cgo
+	stackguard0 uintptr // offset known to liblink
+	stackguard1 uintptr // offset known to liblink
+
+	_panic       *_panic // innermost panic - offset known to liblink
+	_defer       *_defer // innermost defer
+	m            *m      // current m; offset known to arm liblink
+	sched        gobuf
+	syscallsp    uintptr        // if status==Gsyscall, syscallsp = sched.sp to use during gc
+	syscallpc    uintptr        // if status==Gsyscall, syscallpc = sched.pc to use during gc
+	stktopsp     uintptr        // expected sp at top of stack, to check in traceback
+	param        unsafe.Pointer // passed parameter on wakeup
+	atomicstatus uint32
+	stackLock    uint32 // sigprof/scang lock; TODO: fold in to atomicstatus
+	goid         int64
+	schedlink    guintptr
+	waitsince    int64      // approx time when the g become blocked
+	waitreason   waitReason // if status==Gwaiting
+
+	preempt       bool // preemption signal, duplicates stackguard0 = stackpreempt
+	preemptStop   bool // transition to _Gpreempted on preemption; otherwise, just deschedule
+	preemptShrink bool // shrink stack at synchronous safe point
+
+	// asyncSafePoint is set if g is stopped at an asynchronous
+	// safe point. This means there are frames on the stack
+	// without precise pointer information.
+	asyncSafePoint bool
+
+	paniconfault bool // panic (instead of crash) on unexpected fault address
+	gcscandone   bool // g has scanned stack; protected by _Gscan bit in status
+	throwsplit   bool // must not split stack
+	// activeStackChans indicates that there are unlocked channels
+	// pointing into this goroutine's stack. If true, stack
+	// copying needs to acquire channel locks to protect these
+	// areas of the stack.
+	activeStackChans bool
+	// parkingOnChan indicates that the goroutine is about to
+	// park on a chansend or chanrecv. Used to signal an unsafe point
+	// for stack shrinking. It's a boolean value, but is updated atomically.
+	parkingOnChan uint8
+
+	raceignore     int8     // ignore race detection events
+	sysblocktraced bool     // StartTrace has emitted EvGoInSyscall about this goroutine
+	sysexitticks   int64    // cputicks when syscall has returned (for tracing)
+	traceseq       uint64   // trace event sequencer
+	tracelastp     puintptr // last P emitted an event for this goroutine
+	lockedm        muintptr
+	sig            uint32
+	writebuf       []byte
+	sigcode0       uintptr
+	sigcode1       uintptr
+	sigpc          uintptr
+	gopc           uintptr         // pc of go statement that created this goroutine
+	ancestors      *[]ancestorInfo // ancestor information goroutine(s) that created this goroutine (only used if debug.tracebackancestors)
+	startpc        uintptr         // pc of goroutine function
+	racectx        uintptr
+	waiting        *sudog         // sudog structures this g is waiting on (that have a valid elem ptr); in lock order
+	cgoCtxt        []uintptr      // cgo traceback context
+	labels         unsafe.Pointer // profiler labels
+	timer          *timer         // cached timer for time.Sleep
+	selectDone     uint32         // are we participating in a select and did someone win the race?
+
+	// Per-G GC state
+
+	// gcAssistBytes is this G's GC assist credit in terms of
+	// bytes allocated. If this is positive, then the G has credit
+	// to allocate gcAssistBytes bytes without assisting. If this
+	// is negative, then the G must correct this by performing
+	// scan work. We track this in bytes to make it fast to update
+	// and check for debt in the malloc hot path. The assist ratio
+	// determines how this corresponds to scan work debt.
+	gcAssistBytes int64
+}
+
+type m struct {
+	g0      *g     // goroutine with scheduling stack
+	morebuf gobuf  // gobuf arg to morestack
+	divmod  uint32 // div/mod denominator for arm - known to liblink
+
+	// Fields not known to debuggers.
+	procid        uint64       // for debuggers, but offset not hard-coded
+	gsignal       *g           // signal-handling g
+	goSigStack    gsignalStack // Go-allocated signal handling stack
+	sigmask       sigset       // storage for saved signal mask
+	tls           [6]uintptr   // thread-local storage (for x86 extern register)
+	mstartfn      func()
+	curg          *g       // current running goroutine
+	caughtsig     guintptr // goroutine running during fatal signal
+	p             puintptr // attached p for executing go code (nil if not executing go code)
+	nextp         puintptr
+	oldp          puintptr // the p that was attached before executing a syscall
+	id            int64
+	mallocing     int32
+	throwing      int32
+	preemptoff    string // if != &#34;&#34;, keep curg running on this m
+	locks         int32
+	dying         int32
+	profilehz     int32
+	spinning      bool // m is out of work and is actively looking for work
+	blocked       bool // m is blocked on a note
+	newSigstack   bool // minit on C thread called sigaltstack
+	printlock     int8
+	incgo         bool   // m is executing a cgo call
+	freeWait      uint32 // if == 0, safe to free g0 and delete m (atomic)
+	fastrand      [2]uint32
+	needextram    bool
+	traceback     uint8
+	ncgocall      uint64      // number of cgo calls in total
+	ncgo          int32       // number of cgo calls currently in progress
+	cgoCallersUse uint32      // if non-zero, cgoCallers in use temporarily
+	cgoCallers    *cgoCallers // cgo traceback if crashing in cgo call
+	park          note
+	alllink       *m // on allm
+	schedlink     muintptr
+	lockedg       guintptr
+	createstack   [32]uintptr // stack that created this thread.
+	lockedExt     uint32      // tracking for external LockOSThread
+	lockedInt     uint32      // tracking for internal lockOSThread
+	nextwaitm     muintptr    // next m waiting for lock
+	waitunlockf   func(*g, unsafe.Pointer) bool
+	waitlock      unsafe.Pointer
+	waittraceev   byte
+	waittraceskip int
+	startingtrace bool
+	syscalltick   uint32
+	freelink      *m // on sched.freem
+
+	// these are here because they are too large to be on the stack
+	// of low-level NOSPLIT functions.
+	libcall   libcall
+	libcallpc uintptr // for cpu profiler
+	libcallsp uintptr
+	libcallg  guintptr
+	syscall   libcall // stores syscall parameters on windows
+
+	vdsoSP uintptr // SP for traceback while in VDSO call (0 if not in call)
+	vdsoPC uintptr // PC for traceback while in VDSO call
+
+	// preemptGen counts the number of completed preemption
+	// signals. This is used to detect when a preemption is
+	// requested, but fails. Accessed atomically.
+	preemptGen uint32
+
+	// Whether this is a pending preemption signal on this M.
+	// Accessed atomically.
+	signalPending uint32
+
+	dlogPerM
+
+	mOS
+
+	// Up to 10 locks held by this m, maintained by the lock ranking code.
+	locksHeldLen int
+	locksHeld    [10]heldLockInfo
+}
+
+type p struct {
+	id          int32
+	status      uint32 // one of pidle/prunning/...
+	link        puintptr
+	schedtick   uint32     // incremented on every scheduler call
+	syscalltick uint32     // incremented on every system call
+	sysmontick  sysmontick // last tick observed by sysmon
+	m           muintptr   // back-link to associated m (nil if idle)
+	mcache      *mcache
+	pcache      pageCache
+	raceprocctx uintptr
+
+	deferpool    [5][]*_defer // pool of available defer structs of different sizes (see panic.go)
+	deferpoolbuf [5][32]*_defer
+
+	// Cache of goroutine ids, amortizes accesses to runtime·sched.goidgen.
+	goidcache    uint64
+	goidcacheend uint64
+
+	// Queue of runnable goroutines. Accessed without lock.
+	runqhead uint32
+	runqtail uint32
+	runq     [256]guintptr
+	// runnext, if non-nil, is a runnable G that was ready'd by
+	// the current G and should be run next instead of what's in
+	// runq if there's time remaining in the running G's time
+	// slice. It will inherit the time left in the current time
+	// slice. If a set of goroutines is locked in a
+	// communicate-and-wait pattern, this schedules that set as a
+	// unit and eliminates the (potentially large) scheduling
+	// latency that otherwise arises from adding the ready'd
+	// goroutines to the end of the run queue.
+	runnext guintptr
+
+	// Available G's (status == Gdead)
+	gFree struct {
+		gList
+		n int32
+	}
+
+	sudogcache []*sudog
+	sudogbuf   [128]*sudog
+
+	// Cache of mspan objects from the heap.
+	mspancache struct {
+		// We need an explicit length here because this field is used
+		// in allocation codepaths where write barriers are not allowed,
+		// and eliminating the write barrier/keeping it eliminated from
+		// slice updates is tricky, moreso than just managing the length
+		// ourselves.
+		len int
+		buf [128]*mspan
+	}
+
+	tracebuf traceBufPtr
+
+	// traceSweep indicates the sweep events should be traced.
+	// This is used to defer the sweep start event until a span
+	// has actually been swept.
+	traceSweep bool
+	// traceSwept and traceReclaimed track the number of bytes
+	// swept and reclaimed by sweeping in the current sweep loop.
+	traceSwept, traceReclaimed uintptr
+
+	palloc persistentAlloc // per-P to avoid mutex
+
+	_ uint32 // Alignment for atomic fields below
+
+	// The when field of the first entry on the timer heap.
+	// This is updated using atomic functions.
+	// This is 0 if the timer heap is empty.
+	timer0When uint64
+
+	// Per-P GC state
+	gcAssistTime         int64    // Nanoseconds in assistAlloc
+	gcFractionalMarkTime int64    // Nanoseconds in fractional mark worker (atomic)
+	gcBgMarkWorker       guintptr // (atomic)
+	gcMarkWorkerMode     gcMarkWorkerMode
+
+	// gcMarkWorkerStartTime is the nanotime() at which this mark
+	// worker started.
+	gcMarkWorkerStartTime int64
+
+	// gcw is this P's GC work buffer cache. The work buffer is
+	// filled by write barriers, drained by mutator assists, and
+	// disposed on certain GC state transitions.
+	gcw gcWork
+
+	// wbBuf is this P's GC write barrier buffer.
+	//
+	// TODO: Consider caching this in the running G.
+	wbBuf wbBuf
+
+	runSafePointFn uint32 // if 1, run sched.safePointFn at next safe point
+
+	// Lock for timers. We normally access the timers while running
+	// on this P, but the scheduler can also do it from a different P.
+	timersLock mutex
+
+	// Actions to take at some time. This is used to implement the
+	// standard library's time package.
+	// Must hold timersLock to access.
+	timers []*timer
+
+	// Number of timers in P's heap.
+	// Modified using atomic instructions.
+	numTimers uint32
+
+	// Number of timerModifiedEarlier timers on P's heap.
+	// This should only be modified while holding timersLock,
+	// or while the timer status is in a transient state
+	// such as timerModifying.
+	adjustTimers uint32
+
+	// Number of timerDeleted timers in P's heap.
+	// Modified using atomic instructions.
+	deletedTimers uint32
+
+	// Race context used while executing timer functions.
+	timerRaceCtx uintptr
+
+	// preempt is set to indicate that this P should be enter the
+	// scheduler ASAP (regardless of what G is running on it).
+	preempt bool
+
+	pad cpu.CacheLinePad
+}
+GMP模型的一些概念
+上面M中有两个g需要关注下，curg和g0。
+curg就是M当前绑定的G。
+g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增长的栈，而g0的栈是M对应的线程的栈。所有调度相关的代码，会先切换到该goroutine的栈中执行。即，线程的栈也是用的g实现，而不是使用的OS。"><meta name=author content><link rel=canonical href=https://duck-dd.github.io/posts/2021-08-21-go-schedule/><meta name=google-site-verification content="XYZabc"><meta name=yandex-verification content="XYZabc"><meta name=msvalidate.01 content="XYZabc"><link crossorigin=anonymous href=/assets/css/stylesheet.2a8ef18cccda149eb1cd8ec968ba463447d72022979e5c5cae43dcf5d7358750.css integrity="sha256-Ko7xjMzaFJ6xzY7JaLpGNEfXICKXnlxcrkPc9dc1h1A=" rel="preload stylesheet" as=style><link rel=icon href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=16x16 href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=32x32 href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=apple-touch-icon href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=mask-icon href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://duck-dd.github.io/posts/2021-08-21-go-schedule/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous></script><meta property="og:url" content="https://duck-dd.github.io/posts/2021-08-21-go-schedule/"><meta property="og:site_name" content="Duck"><meta property="og:title" content="Golang schedule"><meta property="og:description" content="写在前面 runtime包实现了所有goroutine scheduler、memory allocator、garbage collector细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。
+搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM->GMP演化后的材料。
+GM go1.1版本以前，调度使用GM模型，如下图所示。简单的理解GM模型，就是有一个始终执行的调度函数schedule不停的执行调度计算，当某个M的G执行完成了，调度器就把这个M放回M队列，可绑定执行其他G（如果某个M+G发生了syscall，那么本来并发度是通过M数量控制的，此时并发度就降低了？）；如果G执行过程中创建新的G，会将新的G放入到G全局可执行队列中。G全局可执行队列的操作有一把全局锁，这导致了各个M对G全局队列的操作存在严重的竞争。
+下面这段完全是我的臆测，请别太相信：
+简单概括呢，所以可以认为有：
+G全局可执行队列(以下也可能简称G可执行队列) M可用队列 调度器要做的事就是：
+从G的可执行队列取G并从M的可用队列取M，将二者绑定开始执行G 对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用 那么GM模型有哪些问题呢？
+(重点问题)单一的全局mutex(sched.lock)和集中状态管理 mutex需要保护所有与全局goroutine队列相关操作(创建、完成、重排等等)，竞争严重 (重点问题)per-M内存(M.mcache)问题 每个M都需要一个mcache，会导致资源消耗过大(每个mcache可以吸纳到2MB的内存缓存和其他缓存) 举个栗子，一个陷入syscall的M并不需要使用cache，但是在全部的M中，陷入系统调用的M与执行goroutine的M的比例可能是N:1(N>>1)，这就导致了N/(N+1)比例的mcache在闲置 数据局部性差: 举个栗子，M1执行G1，此时创建了G2，G2通常是立刻进入了G全局可执行队列，而此时M1还在执行G1，所以G2通常被其他M执行，但是G1和G2通常强相关，所以G2最好也在M1上执行，因为G2对M1的缓存命中率更高 goroutine传递问题 goroutine(G)交接(G.nextg)，M之间会经常交接可运行的G 再通俗点说，就是G空转，本来能够好好在一个M上执行完，但是由于全局队列的存在，G一旦回全局队列了，下次就不知道被哪个M取走了，所以叫“空转”；M加载G的上下文是有开销的，所以空转会导致性能下降 频繁的线程阻塞/解阻塞 syscalls情况下，线程经常被阻塞和解阻塞，增加了很多额外开销 通俗点说，M+G syscall，M阻塞，syscall完成后，M解阻塞继续执行G（如果是通过M数量控制并发度，这是不是就导致了并发度降低？） GMP 基于以上说的GM的问题，go1.1以后开始使用GMP调度模型。 G、M、P的定义如下(***/src/runtime/runtime2.go)。
+type g struct { // Stack parameters. // stack describes the actual stack memory: [stack.lo, stack.hi). // stackguard0 is the stack pointer compared in the Go stack growth prologue. // It is stack.lo+StackGuard normally, but can be StackPreempt to trigger a preemption. // stackguard1 is the stack pointer compared in the C stack growth prologue. // It is stack.lo+StackGuard on g0 and gsignal stacks. // It is ~0 on other goroutine stacks, to trigger a call to morestackc (and crash). stack stack // offset known to runtime/cgo stackguard0 uintptr // offset known to liblink stackguard1 uintptr // offset known to liblink _panic *_panic // innermost panic - offset known to liblink _defer *_defer // innermost defer m *m // current m; offset known to arm liblink sched gobuf syscallsp uintptr // if status==Gsyscall, syscallsp = sched.sp to use during gc syscallpc uintptr // if status==Gsyscall, syscallpc = sched.pc to use during gc stktopsp uintptr // expected sp at top of stack, to check in traceback param unsafe.Pointer // passed parameter on wakeup atomicstatus uint32 stackLock uint32 // sigprof/scang lock; TODO: fold in to atomicstatus goid int64 schedlink guintptr waitsince int64 // approx time when the g become blocked waitreason waitReason // if status==Gwaiting preempt bool // preemption signal, duplicates stackguard0 = stackpreempt preemptStop bool // transition to _Gpreempted on preemption; otherwise, just deschedule preemptShrink bool // shrink stack at synchronous safe point // asyncSafePoint is set if g is stopped at an asynchronous // safe point. This means there are frames on the stack // without precise pointer information. asyncSafePoint bool paniconfault bool // panic (instead of crash) on unexpected fault address gcscandone bool // g has scanned stack; protected by _Gscan bit in status throwsplit bool // must not split stack // activeStackChans indicates that there are unlocked channels // pointing into this goroutine's stack. If true, stack // copying needs to acquire channel locks to protect these // areas of the stack. activeStackChans bool // parkingOnChan indicates that the goroutine is about to // park on a chansend or chanrecv. Used to signal an unsafe point // for stack shrinking. It's a boolean value, but is updated atomically. parkingOnChan uint8 raceignore int8 // ignore race detection events sysblocktraced bool // StartTrace has emitted EvGoInSyscall about this goroutine sysexitticks int64 // cputicks when syscall has returned (for tracing) traceseq uint64 // trace event sequencer tracelastp puintptr // last P emitted an event for this goroutine lockedm muintptr sig uint32 writebuf []byte sigcode0 uintptr sigcode1 uintptr sigpc uintptr gopc uintptr // pc of go statement that created this goroutine ancestors *[]ancestorInfo // ancestor information goroutine(s) that created this goroutine (only used if debug.tracebackancestors) startpc uintptr // pc of goroutine function racectx uintptr waiting *sudog // sudog structures this g is waiting on (that have a valid elem ptr); in lock order cgoCtxt []uintptr // cgo traceback context labels unsafe.Pointer // profiler labels timer *timer // cached timer for time.Sleep selectDone uint32 // are we participating in a select and did someone win the race? // Per-G GC state // gcAssistBytes is this G's GC assist credit in terms of // bytes allocated. If this is positive, then the G has credit // to allocate gcAssistBytes bytes without assisting. If this // is negative, then the G must correct this by performing // scan work. We track this in bytes to make it fast to update // and check for debt in the malloc hot path. The assist ratio // determines how this corresponds to scan work debt. gcAssistBytes int64 } type m struct { g0 *g // goroutine with scheduling stack morebuf gobuf // gobuf arg to morestack divmod uint32 // div/mod denominator for arm - known to liblink // Fields not known to debuggers. procid uint64 // for debuggers, but offset not hard-coded gsignal *g // signal-handling g goSigStack gsignalStack // Go-allocated signal handling stack sigmask sigset // storage for saved signal mask tls [6]uintptr // thread-local storage (for x86 extern register) mstartfn func() curg *g // current running goroutine caughtsig guintptr // goroutine running during fatal signal p puintptr // attached p for executing go code (nil if not executing go code) nextp puintptr oldp puintptr // the p that was attached before executing a syscall id int64 mallocing int32 throwing int32 preemptoff string // if != &#34;&#34;, keep curg running on this m locks int32 dying int32 profilehz int32 spinning bool // m is out of work and is actively looking for work blocked bool // m is blocked on a note newSigstack bool // minit on C thread called sigaltstack printlock int8 incgo bool // m is executing a cgo call freeWait uint32 // if == 0, safe to free g0 and delete m (atomic) fastrand [2]uint32 needextram bool traceback uint8 ncgocall uint64 // number of cgo calls in total ncgo int32 // number of cgo calls currently in progress cgoCallersUse uint32 // if non-zero, cgoCallers in use temporarily cgoCallers *cgoCallers // cgo traceback if crashing in cgo call park note alllink *m // on allm schedlink muintptr lockedg guintptr createstack [32]uintptr // stack that created this thread. lockedExt uint32 // tracking for external LockOSThread lockedInt uint32 // tracking for internal lockOSThread nextwaitm muintptr // next m waiting for lock waitunlockf func(*g, unsafe.Pointer) bool waitlock unsafe.Pointer waittraceev byte waittraceskip int startingtrace bool syscalltick uint32 freelink *m // on sched.freem // these are here because they are too large to be on the stack // of low-level NOSPLIT functions. libcall libcall libcallpc uintptr // for cpu profiler libcallsp uintptr libcallg guintptr syscall libcall // stores syscall parameters on windows vdsoSP uintptr // SP for traceback while in VDSO call (0 if not in call) vdsoPC uintptr // PC for traceback while in VDSO call // preemptGen counts the number of completed preemption // signals. This is used to detect when a preemption is // requested, but fails. Accessed atomically. preemptGen uint32 // Whether this is a pending preemption signal on this M. // Accessed atomically. signalPending uint32 dlogPerM mOS // Up to 10 locks held by this m, maintained by the lock ranking code. locksHeldLen int locksHeld [10]heldLockInfo } type p struct { id int32 status uint32 // one of pidle/prunning/... link puintptr schedtick uint32 // incremented on every scheduler call syscalltick uint32 // incremented on every system call sysmontick sysmontick // last tick observed by sysmon m muintptr // back-link to associated m (nil if idle) mcache *mcache pcache pageCache raceprocctx uintptr deferpool [5][]*_defer // pool of available defer structs of different sizes (see panic.go) deferpoolbuf [5][32]*_defer // Cache of goroutine ids, amortizes accesses to runtime·sched.goidgen. goidcache uint64 goidcacheend uint64 // Queue of runnable goroutines. Accessed without lock. runqhead uint32 runqtail uint32 runq [256]guintptr // runnext, if non-nil, is a runnable G that was ready'd by // the current G and should be run next instead of what's in // runq if there's time remaining in the running G's time // slice. It will inherit the time left in the current time // slice. If a set of goroutines is locked in a // communicate-and-wait pattern, this schedules that set as a // unit and eliminates the (potentially large) scheduling // latency that otherwise arises from adding the ready'd // goroutines to the end of the run queue. runnext guintptr // Available G's (status == Gdead) gFree struct { gList n int32 } sudogcache []*sudog sudogbuf [128]*sudog // Cache of mspan objects from the heap. mspancache struct { // We need an explicit length here because this field is used // in allocation codepaths where write barriers are not allowed, // and eliminating the write barrier/keeping it eliminated from // slice updates is tricky, moreso than just managing the length // ourselves. len int buf [128]*mspan } tracebuf traceBufPtr // traceSweep indicates the sweep events should be traced. // This is used to defer the sweep start event until a span // has actually been swept. traceSweep bool // traceSwept and traceReclaimed track the number of bytes // swept and reclaimed by sweeping in the current sweep loop. traceSwept, traceReclaimed uintptr palloc persistentAlloc // per-P to avoid mutex _ uint32 // Alignment for atomic fields below // The when field of the first entry on the timer heap. // This is updated using atomic functions. // This is 0 if the timer heap is empty. timer0When uint64 // Per-P GC state gcAssistTime int64 // Nanoseconds in assistAlloc gcFractionalMarkTime int64 // Nanoseconds in fractional mark worker (atomic) gcBgMarkWorker guintptr // (atomic) gcMarkWorkerMode gcMarkWorkerMode // gcMarkWorkerStartTime is the nanotime() at which this mark // worker started. gcMarkWorkerStartTime int64 // gcw is this P's GC work buffer cache. The work buffer is // filled by write barriers, drained by mutator assists, and // disposed on certain GC state transitions. gcw gcWork // wbBuf is this P's GC write barrier buffer. // // TODO: Consider caching this in the running G. wbBuf wbBuf runSafePointFn uint32 // if 1, run sched.safePointFn at next safe point // Lock for timers. We normally access the timers while running // on this P, but the scheduler can also do it from a different P. timersLock mutex // Actions to take at some time. This is used to implement the // standard library's time package. // Must hold timersLock to access. timers []*timer // Number of timers in P's heap. // Modified using atomic instructions. numTimers uint32 // Number of timerModifiedEarlier timers on P's heap. // This should only be modified while holding timersLock, // or while the timer status is in a transient state // such as timerModifying. adjustTimers uint32 // Number of timerDeleted timers in P's heap. // Modified using atomic instructions. deletedTimers uint32 // Race context used while executing timer functions. timerRaceCtx uintptr // preempt is set to indicate that this P should be enter the // scheduler ASAP (regardless of what G is running on it). preempt bool pad cpu.CacheLinePad } GMP模型的一些概念 上面M中有两个g需要关注下，curg和g0。 curg就是M当前绑定的G。 g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增长的栈，而g0的栈是M对应的线程的栈。所有调度相关的代码，会先切换到该goroutine的栈中执行。即，线程的栈也是用的g实现，而不是使用的OS。"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-08-21T00:00:00+00:00"><meta property="article:modified_time" content="2021-08-21T00:00:00+00:00"><meta property="article:tag" content="Golang"><meta property="article:tag" content="2021"><meta property="og:image" content="https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="Golang schedule"><meta name=twitter:description content="写在前面
+runtime包实现了所有goroutine scheduler、memory allocator、garbage collector细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。
+搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM->GMP演化后的材料。
+GM
+go1.1版本以前，调度使用GM模型，如下图所示。简单的理解GM模型，就是有一个始终执行的调度函数schedule不停的执行调度计算，当某个M的G执行完成了，调度器就把这个M放回M队列，可绑定执行其他G（如果某个M+G发生了syscall，那么本来并发度是通过M数量控制的，此时并发度就降低了？）；如果G执行过程中创建新的G，会将新的G放入到G全局可执行队列中。G全局可执行队列的操作有一把全局锁，这导致了各个M对G全局队列的操作存在严重的竞争。
+下面这段完全是我的臆测，请别太相信：
+
+简单概括呢，所以可以认为有：
+
+G全局可执行队列(以下也可能简称G可执行队列)
+M可用队列
+
+调度器要做的事就是：
+
+从G的可执行队列取G并从M的可用队列取M，将二者绑定开始执行G
+对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用
+
+
+
+那么GM模型有哪些问题呢？
+
+(重点问题)单一的全局mutex(sched.lock)和集中状态管理
+
+mutex需要保护所有与全局goroutine队列相关操作(创建、完成、重排等等)，竞争严重
+
+
+(重点问题)per-M内存(M.mcache)问题
+
+每个M都需要一个mcache，会导致资源消耗过大(每个mcache可以吸纳到2MB的内存缓存和其他缓存)
+
+举个栗子，一个陷入syscall的M并不需要使用cache，但是在全部的M中，陷入系统调用的M与执行goroutine的M的比例可能是N:1(N>>1)，这就导致了N/(N+1)比例的mcache在闲置
+
+
+数据局部性差:
+
+举个栗子，M1执行G1，此时创建了G2，G2通常是立刻进入了G全局可执行队列，而此时M1还在执行G1，所以G2通常被其他M执行，但是G1和G2通常强相关，所以G2最好也在M1上执行，因为G2对M1的缓存命中率更高
+
+
+
+
+goroutine传递问题
+
+goroutine(G)交接(G.nextg)，M之间会经常交接可运行的G
+再通俗点说，就是G空转，本来能够好好在一个M上执行完，但是由于全局队列的存在，G一旦回全局队列了，下次就不知道被哪个M取走了，所以叫“空转”；M加载G的上下文是有开销的，所以空转会导致性能下降
+
+
+频繁的线程阻塞/解阻塞
+
+syscalls情况下，线程经常被阻塞和解阻塞，增加了很多额外开销
+通俗点说，M+G syscall，M阻塞，syscall完成后，M解阻塞继续执行G（如果是通过M数量控制并发度，这是不是就导致了并发度降低？）
+
+
+
+GMP
+基于以上说的GM的问题，go1.1以后开始使用GMP调度模型。
+G、M、P的定义如下(***/src/runtime/runtime2.go)。
+type g struct {
+	// Stack parameters.
+	// stack describes the actual stack memory: [stack.lo, stack.hi).
+	// stackguard0 is the stack pointer compared in the Go stack growth prologue.
+	// It is stack.lo+StackGuard normally, but can be StackPreempt to trigger a preemption.
+	// stackguard1 is the stack pointer compared in the C stack growth prologue.
+	// It is stack.lo+StackGuard on g0 and gsignal stacks.
+	// It is ~0 on other goroutine stacks, to trigger a call to morestackc (and crash).
+	stack       stack   // offset known to runtime/cgo
+	stackguard0 uintptr // offset known to liblink
+	stackguard1 uintptr // offset known to liblink
+
+	_panic       *_panic // innermost panic - offset known to liblink
+	_defer       *_defer // innermost defer
+	m            *m      // current m; offset known to arm liblink
+	sched        gobuf
+	syscallsp    uintptr        // if status==Gsyscall, syscallsp = sched.sp to use during gc
+	syscallpc    uintptr        // if status==Gsyscall, syscallpc = sched.pc to use during gc
+	stktopsp     uintptr        // expected sp at top of stack, to check in traceback
+	param        unsafe.Pointer // passed parameter on wakeup
+	atomicstatus uint32
+	stackLock    uint32 // sigprof/scang lock; TODO: fold in to atomicstatus
+	goid         int64
+	schedlink    guintptr
+	waitsince    int64      // approx time when the g become blocked
+	waitreason   waitReason // if status==Gwaiting
+
+	preempt       bool // preemption signal, duplicates stackguard0 = stackpreempt
+	preemptStop   bool // transition to _Gpreempted on preemption; otherwise, just deschedule
+	preemptShrink bool // shrink stack at synchronous safe point
+
+	// asyncSafePoint is set if g is stopped at an asynchronous
+	// safe point. This means there are frames on the stack
+	// without precise pointer information.
+	asyncSafePoint bool
+
+	paniconfault bool // panic (instead of crash) on unexpected fault address
+	gcscandone   bool // g has scanned stack; protected by _Gscan bit in status
+	throwsplit   bool // must not split stack
+	// activeStackChans indicates that there are unlocked channels
+	// pointing into this goroutine's stack. If true, stack
+	// copying needs to acquire channel locks to protect these
+	// areas of the stack.
+	activeStackChans bool
+	// parkingOnChan indicates that the goroutine is about to
+	// park on a chansend or chanrecv. Used to signal an unsafe point
+	// for stack shrinking. It's a boolean value, but is updated atomically.
+	parkingOnChan uint8
+
+	raceignore     int8     // ignore race detection events
+	sysblocktraced bool     // StartTrace has emitted EvGoInSyscall about this goroutine
+	sysexitticks   int64    // cputicks when syscall has returned (for tracing)
+	traceseq       uint64   // trace event sequencer
+	tracelastp     puintptr // last P emitted an event for this goroutine
+	lockedm        muintptr
+	sig            uint32
+	writebuf       []byte
+	sigcode0       uintptr
+	sigcode1       uintptr
+	sigpc          uintptr
+	gopc           uintptr         // pc of go statement that created this goroutine
+	ancestors      *[]ancestorInfo // ancestor information goroutine(s) that created this goroutine (only used if debug.tracebackancestors)
+	startpc        uintptr         // pc of goroutine function
+	racectx        uintptr
+	waiting        *sudog         // sudog structures this g is waiting on (that have a valid elem ptr); in lock order
+	cgoCtxt        []uintptr      // cgo traceback context
+	labels         unsafe.Pointer // profiler labels
+	timer          *timer         // cached timer for time.Sleep
+	selectDone     uint32         // are we participating in a select and did someone win the race?
+
+	// Per-G GC state
+
+	// gcAssistBytes is this G's GC assist credit in terms of
+	// bytes allocated. If this is positive, then the G has credit
+	// to allocate gcAssistBytes bytes without assisting. If this
+	// is negative, then the G must correct this by performing
+	// scan work. We track this in bytes to make it fast to update
+	// and check for debt in the malloc hot path. The assist ratio
+	// determines how this corresponds to scan work debt.
+	gcAssistBytes int64
+}
+
+type m struct {
+	g0      *g     // goroutine with scheduling stack
+	morebuf gobuf  // gobuf arg to morestack
+	divmod  uint32 // div/mod denominator for arm - known to liblink
+
+	// Fields not known to debuggers.
+	procid        uint64       // for debuggers, but offset not hard-coded
+	gsignal       *g           // signal-handling g
+	goSigStack    gsignalStack // Go-allocated signal handling stack
+	sigmask       sigset       // storage for saved signal mask
+	tls           [6]uintptr   // thread-local storage (for x86 extern register)
+	mstartfn      func()
+	curg          *g       // current running goroutine
+	caughtsig     guintptr // goroutine running during fatal signal
+	p             puintptr // attached p for executing go code (nil if not executing go code)
+	nextp         puintptr
+	oldp          puintptr // the p that was attached before executing a syscall
+	id            int64
+	mallocing     int32
+	throwing      int32
+	preemptoff    string // if != &#34;&#34;, keep curg running on this m
+	locks         int32
+	dying         int32
+	profilehz     int32
+	spinning      bool // m is out of work and is actively looking for work
+	blocked       bool // m is blocked on a note
+	newSigstack   bool // minit on C thread called sigaltstack
+	printlock     int8
+	incgo         bool   // m is executing a cgo call
+	freeWait      uint32 // if == 0, safe to free g0 and delete m (atomic)
+	fastrand      [2]uint32
+	needextram    bool
+	traceback     uint8
+	ncgocall      uint64      // number of cgo calls in total
+	ncgo          int32       // number of cgo calls currently in progress
+	cgoCallersUse uint32      // if non-zero, cgoCallers in use temporarily
+	cgoCallers    *cgoCallers // cgo traceback if crashing in cgo call
+	park          note
+	alllink       *m // on allm
+	schedlink     muintptr
+	lockedg       guintptr
+	createstack   [32]uintptr // stack that created this thread.
+	lockedExt     uint32      // tracking for external LockOSThread
+	lockedInt     uint32      // tracking for internal lockOSThread
+	nextwaitm     muintptr    // next m waiting for lock
+	waitunlockf   func(*g, unsafe.Pointer) bool
+	waitlock      unsafe.Pointer
+	waittraceev   byte
+	waittraceskip int
+	startingtrace bool
+	syscalltick   uint32
+	freelink      *m // on sched.freem
+
+	// these are here because they are too large to be on the stack
+	// of low-level NOSPLIT functions.
+	libcall   libcall
+	libcallpc uintptr // for cpu profiler
+	libcallsp uintptr
+	libcallg  guintptr
+	syscall   libcall // stores syscall parameters on windows
+
+	vdsoSP uintptr // SP for traceback while in VDSO call (0 if not in call)
+	vdsoPC uintptr // PC for traceback while in VDSO call
+
+	// preemptGen counts the number of completed preemption
+	// signals. This is used to detect when a preemption is
+	// requested, but fails. Accessed atomically.
+	preemptGen uint32
+
+	// Whether this is a pending preemption signal on this M.
+	// Accessed atomically.
+	signalPending uint32
+
+	dlogPerM
+
+	mOS
+
+	// Up to 10 locks held by this m, maintained by the lock ranking code.
+	locksHeldLen int
+	locksHeld    [10]heldLockInfo
+}
+
+type p struct {
+	id          int32
+	status      uint32 // one of pidle/prunning/...
+	link        puintptr
+	schedtick   uint32     // incremented on every scheduler call
+	syscalltick uint32     // incremented on every system call
+	sysmontick  sysmontick // last tick observed by sysmon
+	m           muintptr   // back-link to associated m (nil if idle)
+	mcache      *mcache
+	pcache      pageCache
+	raceprocctx uintptr
+
+	deferpool    [5][]*_defer // pool of available defer structs of different sizes (see panic.go)
+	deferpoolbuf [5][32]*_defer
+
+	// Cache of goroutine ids, amortizes accesses to runtime·sched.goidgen.
+	goidcache    uint64
+	goidcacheend uint64
+
+	// Queue of runnable goroutines. Accessed without lock.
+	runqhead uint32
+	runqtail uint32
+	runq     [256]guintptr
+	// runnext, if non-nil, is a runnable G that was ready'd by
+	// the current G and should be run next instead of what's in
+	// runq if there's time remaining in the running G's time
+	// slice. It will inherit the time left in the current time
+	// slice. If a set of goroutines is locked in a
+	// communicate-and-wait pattern, this schedules that set as a
+	// unit and eliminates the (potentially large) scheduling
+	// latency that otherwise arises from adding the ready'd
+	// goroutines to the end of the run queue.
+	runnext guintptr
+
+	// Available G's (status == Gdead)
+	gFree struct {
+		gList
+		n int32
+	}
+
+	sudogcache []*sudog
+	sudogbuf   [128]*sudog
+
+	// Cache of mspan objects from the heap.
+	mspancache struct {
+		// We need an explicit length here because this field is used
+		// in allocation codepaths where write barriers are not allowed,
+		// and eliminating the write barrier/keeping it eliminated from
+		// slice updates is tricky, moreso than just managing the length
+		// ourselves.
+		len int
+		buf [128]*mspan
+	}
+
+	tracebuf traceBufPtr
+
+	// traceSweep indicates the sweep events should be traced.
+	// This is used to defer the sweep start event until a span
+	// has actually been swept.
+	traceSweep bool
+	// traceSwept and traceReclaimed track the number of bytes
+	// swept and reclaimed by sweeping in the current sweep loop.
+	traceSwept, traceReclaimed uintptr
+
+	palloc persistentAlloc // per-P to avoid mutex
+
+	_ uint32 // Alignment for atomic fields below
+
+	// The when field of the first entry on the timer heap.
+	// This is updated using atomic functions.
+	// This is 0 if the timer heap is empty.
+	timer0When uint64
+
+	// Per-P GC state
+	gcAssistTime         int64    // Nanoseconds in assistAlloc
+	gcFractionalMarkTime int64    // Nanoseconds in fractional mark worker (atomic)
+	gcBgMarkWorker       guintptr // (atomic)
+	gcMarkWorkerMode     gcMarkWorkerMode
+
+	// gcMarkWorkerStartTime is the nanotime() at which this mark
+	// worker started.
+	gcMarkWorkerStartTime int64
+
+	// gcw is this P's GC work buffer cache. The work buffer is
+	// filled by write barriers, drained by mutator assists, and
+	// disposed on certain GC state transitions.
+	gcw gcWork
+
+	// wbBuf is this P's GC write barrier buffer.
+	//
+	// TODO: Consider caching this in the running G.
+	wbBuf wbBuf
+
+	runSafePointFn uint32 // if 1, run sched.safePointFn at next safe point
+
+	// Lock for timers. We normally access the timers while running
+	// on this P, but the scheduler can also do it from a different P.
+	timersLock mutex
+
+	// Actions to take at some time. This is used to implement the
+	// standard library's time package.
+	// Must hold timersLock to access.
+	timers []*timer
+
+	// Number of timers in P's heap.
+	// Modified using atomic instructions.
+	numTimers uint32
+
+	// Number of timerModifiedEarlier timers on P's heap.
+	// This should only be modified while holding timersLock,
+	// or while the timer status is in a transient state
+	// such as timerModifying.
+	adjustTimers uint32
+
+	// Number of timerDeleted timers in P's heap.
+	// Modified using atomic instructions.
+	deletedTimers uint32
+
+	// Race context used while executing timer functions.
+	timerRaceCtx uintptr
+
+	// preempt is set to indicate that this P should be enter the
+	// scheduler ASAP (regardless of what G is running on it).
+	preempt bool
+
+	pad cpu.CacheLinePad
+}
+GMP模型的一些概念
+上面M中有两个g需要关注下，curg和g0。
+curg就是M当前绑定的G。
+g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增长的栈，而g0的栈是M对应的线程的栈。所有调度相关的代码，会先切换到该goroutine的栈中执行。即，线程的栈也是用的g实现，而不是使用的OS。"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://duck-dd.github.io/posts/"},{"@type":"ListItem","position":2,"name":"Golang schedule","item":"https://duck-dd.github.io/posts/2021-08-21-go-schedule/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Golang schedule","name":"Golang schedule","description":"写在前面 runtime包实现了所有goroutine scheduler、memory allocator、garbage collector细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。\n搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM-\u0026gt;GMP演化后的材料。\nGM go1.1版本以前，调度使用GM模型，如下图所示。简单的理解GM模型，就是有一个始终执行的调度函数schedule不停的执行调度计算，当某个M的G执行完成了，调度器就把这个M放回M队列，可绑定执行其他G（如果某个M+G发生了syscall，那么本来并发度是通过M数量控制的，此时并发度就降低了？）；如果G执行过程中创建新的G，会将新的G放入到G全局可执行队列中。G全局可执行队列的操作有一把全局锁，这导致了各个M对G全局队列的操作存在严重的竞争。\n下面这段完全是我的臆测，请别太相信：\n简单概括呢，所以可以认为有：\nG全局可执行队列(以下也可能简称G可执行队列) M可用队列 调度器要做的事就是：\n从G的可执行队列取G并从M的可用队列取M，将二者绑定开始执行G 对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用 那么GM模型有哪些问题呢？\n(重点问题)单一的全局mutex(sched.lock)和集中状态管理 mutex需要保护所有与全局goroutine队列相关操作(创建、完成、重排等等)，竞争严重 (重点问题)per-M内存(M.mcache)问题 每个M都需要一个mcache，会导致资源消耗过大(每个mcache可以吸纳到2MB的内存缓存和其他缓存) 举个栗子，一个陷入syscall的M并不需要使用cache，但是在全部的M中，陷入系统调用的M与执行goroutine的M的比例可能是N:1(N\u0026gt;\u0026gt;1)，这就导致了N/(N+1)比例的mcache在闲置 数据局部性差: 举个栗子，M1执行G1，此时创建了G2，G2通常是立刻进入了G全局可执行队列，而此时M1还在执行G1，所以G2通常被其他M执行，但是G1和G2通常强相关，所以G2最好也在M1上执行，因为G2对M1的缓存命中率更高 goroutine传递问题 goroutine(G)交接(G.nextg)，M之间会经常交接可运行的G 再通俗点说，就是G空转，本来能够好好在一个M上执行完，但是由于全局队列的存在，G一旦回全局队列了，下次就不知道被哪个M取走了，所以叫“空转”；M加载G的上下文是有开销的，所以空转会导致性能下降 频繁的线程阻塞/解阻塞 syscalls情况下，线程经常被阻塞和解阻塞，增加了很多额外开销 通俗点说，M+G syscall，M阻塞，syscall完成后，M解阻塞继续执行G（如果是通过M数量控制并发度，这是不是就导致了并发度降低？） GMP 基于以上说的GM的问题，go1.1以后开始使用GMP调度模型。 G、M、P的定义如下(***/src/runtime/runtime2.go)。\ntype g struct { // Stack parameters. // stack describes the actual stack memory: [stack.lo, stack.hi). // stackguard0 is the stack pointer compared in the Go stack growth prologue. // It is stack.lo+StackGuard normally, but can be StackPreempt to trigger a preemption. // stackguard1 is the stack pointer compared in the C stack growth prologue. // It is stack.lo+StackGuard on g0 and gsignal stacks. // It is ~0 on other goroutine stacks, to trigger a call to morestackc (and crash). stack stack // offset known to runtime/cgo stackguard0 uintptr // offset known to liblink stackguard1 uintptr // offset known to liblink _panic *_panic // innermost panic - offset known to liblink _defer *_defer // innermost defer m *m // current m; offset known to arm liblink sched gobuf syscallsp uintptr // if status==Gsyscall, syscallsp = sched.sp to use during gc syscallpc uintptr // if status==Gsyscall, syscallpc = sched.pc to use during gc stktopsp uintptr // expected sp at top of stack, to check in traceback param unsafe.Pointer // passed parameter on wakeup atomicstatus uint32 stackLock uint32 // sigprof/scang lock; TODO: fold in to atomicstatus goid int64 schedlink guintptr waitsince int64 // approx time when the g become blocked waitreason waitReason // if status==Gwaiting preempt bool // preemption signal, duplicates stackguard0 = stackpreempt preemptStop bool // transition to _Gpreempted on preemption; otherwise, just deschedule preemptShrink bool // shrink stack at synchronous safe point // asyncSafePoint is set if g is stopped at an asynchronous // safe point. This means there are frames on the stack // without precise pointer information. asyncSafePoint bool paniconfault bool // panic (instead of crash) on unexpected fault address gcscandone bool // g has scanned stack; protected by _Gscan bit in status throwsplit bool // must not split stack // activeStackChans indicates that there are unlocked channels // pointing into this goroutine\u0026#39;s stack. If true, stack // copying needs to acquire channel locks to protect these // areas of the stack. activeStackChans bool // parkingOnChan indicates that the goroutine is about to // park on a chansend or chanrecv. Used to signal an unsafe point // for stack shrinking. It\u0026#39;s a boolean value, but is updated atomically. parkingOnChan uint8 raceignore int8 // ignore race detection events sysblocktraced bool // StartTrace has emitted EvGoInSyscall about this goroutine sysexitticks int64 // cputicks when syscall has returned (for tracing) traceseq uint64 // trace event sequencer tracelastp puintptr // last P emitted an event for this goroutine lockedm muintptr sig uint32 writebuf []byte sigcode0 uintptr sigcode1 uintptr sigpc uintptr gopc uintptr // pc of go statement that created this goroutine ancestors *[]ancestorInfo // ancestor information goroutine(s) that created this goroutine (only used if debug.tracebackancestors) startpc uintptr // pc of goroutine function racectx uintptr waiting *sudog // sudog structures this g is waiting on (that have a valid elem ptr); in lock order cgoCtxt []uintptr // cgo traceback context labels unsafe.Pointer // profiler labels timer *timer // cached timer for time.Sleep selectDone uint32 // are we participating in a select and did someone win the race? // Per-G GC state // gcAssistBytes is this G\u0026#39;s GC assist credit in terms of // bytes allocated. If this is positive, then the G has credit // to allocate gcAssistBytes bytes without assisting. If this // is negative, then the G must correct this by performing // scan work. We track this in bytes to make it fast to update // and check for debt in the malloc hot path. The assist ratio // determines how this corresponds to scan work debt. gcAssistBytes int64 } type m struct { g0 *g // goroutine with scheduling stack morebuf gobuf // gobuf arg to morestack divmod uint32 // div/mod denominator for arm - known to liblink // Fields not known to debuggers. procid uint64 // for debuggers, but offset not hard-coded gsignal *g // signal-handling g goSigStack gsignalStack // Go-allocated signal handling stack sigmask sigset // storage for saved signal mask tls [6]uintptr // thread-local storage (for x86 extern register) mstartfn func() curg *g // current running goroutine caughtsig guintptr // goroutine running during fatal signal p puintptr // attached p for executing go code (nil if not executing go code) nextp puintptr oldp puintptr // the p that was attached before executing a syscall id int64 mallocing int32 throwing int32 preemptoff string // if != \u0026#34;\u0026#34;, keep curg running on this m locks int32 dying int32 profilehz int32 spinning bool // m is out of work and is actively looking for work blocked bool // m is blocked on a note newSigstack bool // minit on C thread called sigaltstack printlock int8 incgo bool // m is executing a cgo call freeWait uint32 // if == 0, safe to free g0 and delete m (atomic) fastrand [2]uint32 needextram bool traceback uint8 ncgocall uint64 // number of cgo calls in total ncgo int32 // number of cgo calls currently in progress cgoCallersUse uint32 // if non-zero, cgoCallers in use temporarily cgoCallers *cgoCallers // cgo traceback if crashing in cgo call park note alllink *m // on allm schedlink muintptr lockedg guintptr createstack [32]uintptr // stack that created this thread. lockedExt uint32 // tracking for external LockOSThread lockedInt uint32 // tracking for internal lockOSThread nextwaitm muintptr // next m waiting for lock waitunlockf func(*g, unsafe.Pointer) bool waitlock unsafe.Pointer waittraceev byte waittraceskip int startingtrace bool syscalltick uint32 freelink *m // on sched.freem // these are here because they are too large to be on the stack // of low-level NOSPLIT functions. libcall libcall libcallpc uintptr // for cpu profiler libcallsp uintptr libcallg guintptr syscall libcall // stores syscall parameters on windows vdsoSP uintptr // SP for traceback while in VDSO call (0 if not in call) vdsoPC uintptr // PC for traceback while in VDSO call // preemptGen counts the number of completed preemption // signals. This is used to detect when a preemption is // requested, but fails. Accessed atomically. preemptGen uint32 // Whether this is a pending preemption signal on this M. // Accessed atomically. signalPending uint32 dlogPerM mOS // Up to 10 locks held by this m, maintained by the lock ranking code. locksHeldLen int locksHeld [10]heldLockInfo } type p struct { id int32 status uint32 // one of pidle/prunning/... link puintptr schedtick uint32 // incremented on every scheduler call syscalltick uint32 // incremented on every system call sysmontick sysmontick // last tick observed by sysmon m muintptr // back-link to associated m (nil if idle) mcache *mcache pcache pageCache raceprocctx uintptr deferpool [5][]*_defer // pool of available defer structs of different sizes (see panic.go) deferpoolbuf [5][32]*_defer // Cache of goroutine ids, amortizes accesses to runtime·sched.goidgen. goidcache uint64 goidcacheend uint64 // Queue of runnable goroutines. Accessed without lock. runqhead uint32 runqtail uint32 runq [256]guintptr // runnext, if non-nil, is a runnable G that was ready\u0026#39;d by // the current G and should be run next instead of what\u0026#39;s in // runq if there\u0026#39;s time remaining in the running G\u0026#39;s time // slice. It will inherit the time left in the current time // slice. If a set of goroutines is locked in a // communicate-and-wait pattern, this schedules that set as a // unit and eliminates the (potentially large) scheduling // latency that otherwise arises from adding the ready\u0026#39;d // goroutines to the end of the run queue. runnext guintptr // Available G\u0026#39;s (status == Gdead) gFree struct { gList n int32 } sudogcache []*sudog sudogbuf [128]*sudog // Cache of mspan objects from the heap. mspancache struct { // We need an explicit length here because this field is used // in allocation codepaths where write barriers are not allowed, // and eliminating the write barrier/keeping it eliminated from // slice updates is tricky, moreso than just managing the length // ourselves. len int buf [128]*mspan } tracebuf traceBufPtr // traceSweep indicates the sweep events should be traced. // This is used to defer the sweep start event until a span // has actually been swept. traceSweep bool // traceSwept and traceReclaimed track the number of bytes // swept and reclaimed by sweeping in the current sweep loop. traceSwept, traceReclaimed uintptr palloc persistentAlloc // per-P to avoid mutex _ uint32 // Alignment for atomic fields below // The when field of the first entry on the timer heap. // This is updated using atomic functions. // This is 0 if the timer heap is empty. timer0When uint64 // Per-P GC state gcAssistTime int64 // Nanoseconds in assistAlloc gcFractionalMarkTime int64 // Nanoseconds in fractional mark worker (atomic) gcBgMarkWorker guintptr // (atomic) gcMarkWorkerMode gcMarkWorkerMode // gcMarkWorkerStartTime is the nanotime() at which this mark // worker started. gcMarkWorkerStartTime int64 // gcw is this P\u0026#39;s GC work buffer cache. The work buffer is // filled by write barriers, drained by mutator assists, and // disposed on certain GC state transitions. gcw gcWork // wbBuf is this P\u0026#39;s GC write barrier buffer. // // TODO: Consider caching this in the running G. wbBuf wbBuf runSafePointFn uint32 // if 1, run sched.safePointFn at next safe point // Lock for timers. We normally access the timers while running // on this P, but the scheduler can also do it from a different P. timersLock mutex // Actions to take at some time. This is used to implement the // standard library\u0026#39;s time package. // Must hold timersLock to access. timers []*timer // Number of timers in P\u0026#39;s heap. // Modified using atomic instructions. numTimers uint32 // Number of timerModifiedEarlier timers on P\u0026#39;s heap. // This should only be modified while holding timersLock, // or while the timer status is in a transient state // such as timerModifying. adjustTimers uint32 // Number of timerDeleted timers in P\u0026#39;s heap. // Modified using atomic instructions. deletedTimers uint32 // Race context used while executing timer functions. timerRaceCtx uintptr // preempt is set to indicate that this P should be enter the // scheduler ASAP (regardless of what G is running on it). preempt bool pad cpu.CacheLinePad } GMP模型的一些概念 上面M中有两个g需要关注下，curg和g0。 curg就是M当前绑定的G。 g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增长的栈，而g0的栈是M对应的线程的栈。所有调度相关的代码，会先切换到该goroutine的栈中执行。即，线程的栈也是用的g实现，而不是使用的OS。\n","keywords":["Golang","2021"],"articleBody":"写在前面 runtime包实现了所有goroutine scheduler、memory allocator、garbage collector细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。\n搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM-\u003eGMP演化后的材料。\nGM go1.1版本以前，调度使用GM模型，如下图所示。简单的理解GM模型，就是有一个始终执行的调度函数schedule不停的执行调度计算，当某个M的G执行完成了，调度器就把这个M放回M队列，可绑定执行其他G（如果某个M+G发生了syscall，那么本来并发度是通过M数量控制的，此时并发度就降低了？）；如果G执行过程中创建新的G，会将新的G放入到G全局可执行队列中。G全局可执行队列的操作有一把全局锁，这导致了各个M对G全局队列的操作存在严重的竞争。\n下面这段完全是我的臆测，请别太相信：\n简单概括呢，所以可以认为有：\nG全局可执行队列(以下也可能简称G可执行队列) M可用队列 调度器要做的事就是：\n从G的可执行队列取G并从M的可用队列取M，将二者绑定开始执行G 对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用 那么GM模型有哪些问题呢？\n(重点问题)单一的全局mutex(sched.lock)和集中状态管理 mutex需要保护所有与全局goroutine队列相关操作(创建、完成、重排等等)，竞争严重 (重点问题)per-M内存(M.mcache)问题 每个M都需要一个mcache，会导致资源消耗过大(每个mcache可以吸纳到2MB的内存缓存和其他缓存) 举个栗子，一个陷入syscall的M并不需要使用cache，但是在全部的M中，陷入系统调用的M与执行goroutine的M的比例可能是N:1(N\u003e\u003e1)，这就导致了N/(N+1)比例的mcache在闲置 数据局部性差: 举个栗子，M1执行G1，此时创建了G2，G2通常是立刻进入了G全局可执行队列，而此时M1还在执行G1，所以G2通常被其他M执行，但是G1和G2通常强相关，所以G2最好也在M1上执行，因为G2对M1的缓存命中率更高 goroutine传递问题 goroutine(G)交接(G.nextg)，M之间会经常交接可运行的G 再通俗点说，就是G空转，本来能够好好在一个M上执行完，但是由于全局队列的存在，G一旦回全局队列了，下次就不知道被哪个M取走了，所以叫“空转”；M加载G的上下文是有开销的，所以空转会导致性能下降 频繁的线程阻塞/解阻塞 syscalls情况下，线程经常被阻塞和解阻塞，增加了很多额外开销 通俗点说，M+G syscall，M阻塞，syscall完成后，M解阻塞继续执行G（如果是通过M数量控制并发度，这是不是就导致了并发度降低？） GMP 基于以上说的GM的问题，go1.1以后开始使用GMP调度模型。 G、M、P的定义如下(***/src/runtime/runtime2.go)。\ntype g struct { // Stack parameters. // stack describes the actual stack memory: [stack.lo, stack.hi). // stackguard0 is the stack pointer compared in the Go stack growth prologue. // It is stack.lo+StackGuard normally, but can be StackPreempt to trigger a preemption. // stackguard1 is the stack pointer compared in the C stack growth prologue. // It is stack.lo+StackGuard on g0 and gsignal stacks. // It is ~0 on other goroutine stacks, to trigger a call to morestackc (and crash). stack stack // offset known to runtime/cgo stackguard0 uintptr // offset known to liblink stackguard1 uintptr // offset known to liblink _panic *_panic // innermost panic - offset known to liblink _defer *_defer // innermost defer m *m // current m; offset known to arm liblink sched gobuf syscallsp uintptr // if status==Gsyscall, syscallsp = sched.sp to use during gc syscallpc uintptr // if status==Gsyscall, syscallpc = sched.pc to use during gc stktopsp uintptr // expected sp at top of stack, to check in traceback param unsafe.Pointer // passed parameter on wakeup atomicstatus uint32 stackLock uint32 // sigprof/scang lock; TODO: fold in to atomicstatus goid int64 schedlink guintptr waitsince int64 // approx time when the g become blocked waitreason waitReason // if status==Gwaiting preempt bool // preemption signal, duplicates stackguard0 = stackpreempt preemptStop bool // transition to _Gpreempted on preemption; otherwise, just deschedule preemptShrink bool // shrink stack at synchronous safe point // asyncSafePoint is set if g is stopped at an asynchronous // safe point. This means there are frames on the stack // without precise pointer information. asyncSafePoint bool paniconfault bool // panic (instead of crash) on unexpected fault address gcscandone bool // g has scanned stack; protected by _Gscan bit in status throwsplit bool // must not split stack // activeStackChans indicates that there are unlocked channels // pointing into this goroutine's stack. If true, stack // copying needs to acquire channel locks to protect these // areas of the stack. activeStackChans bool // parkingOnChan indicates that the goroutine is about to // park on a chansend or chanrecv. Used to signal an unsafe point // for stack shrinking. It's a boolean value, but is updated atomically. parkingOnChan uint8 raceignore int8 // ignore race detection events sysblocktraced bool // StartTrace has emitted EvGoInSyscall about this goroutine sysexitticks int64 // cputicks when syscall has returned (for tracing) traceseq uint64 // trace event sequencer tracelastp puintptr // last P emitted an event for this goroutine lockedm muintptr sig uint32 writebuf []byte sigcode0 uintptr sigcode1 uintptr sigpc uintptr gopc uintptr // pc of go statement that created this goroutine ancestors *[]ancestorInfo // ancestor information goroutine(s) that created this goroutine (only used if debug.tracebackancestors) startpc uintptr // pc of goroutine function racectx uintptr waiting *sudog // sudog structures this g is waiting on (that have a valid elem ptr); in lock order cgoCtxt []uintptr // cgo traceback context labels unsafe.Pointer // profiler labels timer *timer // cached timer for time.Sleep selectDone uint32 // are we participating in a select and did someone win the race? // Per-G GC state // gcAssistBytes is this G's GC assist credit in terms of // bytes allocated. If this is positive, then the G has credit // to allocate gcAssistBytes bytes without assisting. If this // is negative, then the G must correct this by performing // scan work. We track this in bytes to make it fast to update // and check for debt in the malloc hot path. The assist ratio // determines how this corresponds to scan work debt. gcAssistBytes int64 } type m struct { g0 *g // goroutine with scheduling stack morebuf gobuf // gobuf arg to morestack divmod uint32 // div/mod denominator for arm - known to liblink // Fields not known to debuggers. procid uint64 // for debuggers, but offset not hard-coded gsignal *g // signal-handling g goSigStack gsignalStack // Go-allocated signal handling stack sigmask sigset // storage for saved signal mask tls [6]uintptr // thread-local storage (for x86 extern register) mstartfn func() curg *g // current running goroutine caughtsig guintptr // goroutine running during fatal signal p puintptr // attached p for executing go code (nil if not executing go code) nextp puintptr oldp puintptr // the p that was attached before executing a syscall id int64 mallocing int32 throwing int32 preemptoff string // if != \"\", keep curg running on this m locks int32 dying int32 profilehz int32 spinning bool // m is out of work and is actively looking for work blocked bool // m is blocked on a note newSigstack bool // minit on C thread called sigaltstack printlock int8 incgo bool // m is executing a cgo call freeWait uint32 // if == 0, safe to free g0 and delete m (atomic) fastrand [2]uint32 needextram bool traceback uint8 ncgocall uint64 // number of cgo calls in total ncgo int32 // number of cgo calls currently in progress cgoCallersUse uint32 // if non-zero, cgoCallers in use temporarily cgoCallers *cgoCallers // cgo traceback if crashing in cgo call park note alllink *m // on allm schedlink muintptr lockedg guintptr createstack [32]uintptr // stack that created this thread. lockedExt uint32 // tracking for external LockOSThread lockedInt uint32 // tracking for internal lockOSThread nextwaitm muintptr // next m waiting for lock waitunlockf func(*g, unsafe.Pointer) bool waitlock unsafe.Pointer waittraceev byte waittraceskip int startingtrace bool syscalltick uint32 freelink *m // on sched.freem // these are here because they are too large to be on the stack // of low-level NOSPLIT functions. libcall libcall libcallpc uintptr // for cpu profiler libcallsp uintptr libcallg guintptr syscall libcall // stores syscall parameters on windows vdsoSP uintptr // SP for traceback while in VDSO call (0 if not in call) vdsoPC uintptr // PC for traceback while in VDSO call // preemptGen counts the number of completed preemption // signals. This is used to detect when a preemption is // requested, but fails. Accessed atomically. preemptGen uint32 // Whether this is a pending preemption signal on this M. // Accessed atomically. signalPending uint32 dlogPerM mOS // Up to 10 locks held by this m, maintained by the lock ranking code. locksHeldLen int locksHeld [10]heldLockInfo } type p struct { id int32 status uint32 // one of pidle/prunning/... link puintptr schedtick uint32 // incremented on every scheduler call syscalltick uint32 // incremented on every system call sysmontick sysmontick // last tick observed by sysmon m muintptr // back-link to associated m (nil if idle) mcache *mcache pcache pageCache raceprocctx uintptr deferpool [5][]*_defer // pool of available defer structs of different sizes (see panic.go) deferpoolbuf [5][32]*_defer // Cache of goroutine ids, amortizes accesses to runtime·sched.goidgen. goidcache uint64 goidcacheend uint64 // Queue of runnable goroutines. Accessed without lock. runqhead uint32 runqtail uint32 runq [256]guintptr // runnext, if non-nil, is a runnable G that was ready'd by // the current G and should be run next instead of what's in // runq if there's time remaining in the running G's time // slice. It will inherit the time left in the current time // slice. If a set of goroutines is locked in a // communicate-and-wait pattern, this schedules that set as a // unit and eliminates the (potentially large) scheduling // latency that otherwise arises from adding the ready'd // goroutines to the end of the run queue. runnext guintptr // Available G's (status == Gdead) gFree struct { gList n int32 } sudogcache []*sudog sudogbuf [128]*sudog // Cache of mspan objects from the heap. mspancache struct { // We need an explicit length here because this field is used // in allocation codepaths where write barriers are not allowed, // and eliminating the write barrier/keeping it eliminated from // slice updates is tricky, moreso than just managing the length // ourselves. len int buf [128]*mspan } tracebuf traceBufPtr // traceSweep indicates the sweep events should be traced. // This is used to defer the sweep start event until a span // has actually been swept. traceSweep bool // traceSwept and traceReclaimed track the number of bytes // swept and reclaimed by sweeping in the current sweep loop. traceSwept, traceReclaimed uintptr palloc persistentAlloc // per-P to avoid mutex _ uint32 // Alignment for atomic fields below // The when field of the first entry on the timer heap. // This is updated using atomic functions. // This is 0 if the timer heap is empty. timer0When uint64 // Per-P GC state gcAssistTime int64 // Nanoseconds in assistAlloc gcFractionalMarkTime int64 // Nanoseconds in fractional mark worker (atomic) gcBgMarkWorker guintptr // (atomic) gcMarkWorkerMode gcMarkWorkerMode // gcMarkWorkerStartTime is the nanotime() at which this mark // worker started. gcMarkWorkerStartTime int64 // gcw is this P's GC work buffer cache. The work buffer is // filled by write barriers, drained by mutator assists, and // disposed on certain GC state transitions. gcw gcWork // wbBuf is this P's GC write barrier buffer. // // TODO: Consider caching this in the running G. wbBuf wbBuf runSafePointFn uint32 // if 1, run sched.safePointFn at next safe point // Lock for timers. We normally access the timers while running // on this P, but the scheduler can also do it from a different P. timersLock mutex // Actions to take at some time. This is used to implement the // standard library's time package. // Must hold timersLock to access. timers []*timer // Number of timers in P's heap. // Modified using atomic instructions. numTimers uint32 // Number of timerModifiedEarlier timers on P's heap. // This should only be modified while holding timersLock, // or while the timer status is in a transient state // such as timerModifying. adjustTimers uint32 // Number of timerDeleted timers in P's heap. // Modified using atomic instructions. deletedTimers uint32 // Race context used while executing timer functions. timerRaceCtx uintptr // preempt is set to indicate that this P should be enter the // scheduler ASAP (regardless of what G is running on it). preempt bool pad cpu.CacheLinePad } GMP模型的一些概念 上面M中有两个g需要关注下，curg和g0。 curg就是M当前绑定的G。 g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增长的栈，而g0的栈是M对应的线程的栈。所有调度相关的代码，会先切换到该goroutine的栈中执行。即，线程的栈也是用的g实现，而不是使用的OS。\n反正上述定义我是没有逐个字段的去理解，还是靠嘴说吧：\nG(Goroutine): goroutine，go func(){...}创建的 G会保存他关联的M G会保存全局队列中下一个G(按链表理解) G默认栈2KB G保存上下文，现场保护\u0026现场恢复的寄存器 M(Machine): 抽象化代表内核线程 M保存了自身的栈信息，当前M上执行的G信息，以及绑定的P信息 M有线程栈，若没有为M的线程栈提供内存，则操作系统会为M提供内存 当指定线程栈，则M.stack-\u003eG.stack，M的PC寄存器指向G提供的函数，然后开始执行 P(Processor): 处理器，一般P的数量默认为机器逻辑核数(go早期版本默认值1)，可以通过GOMAXPROCS修改，P的数量其实就是并发量 P负责调度goroutines，per-P维护一个本地goroutine队列，M从P获取goroutine并执行 per-P维护一个本地mcache TODO：这个点怎么理解？ 综上呢，P是M执行所需要的上下文环境，是处理用户级代码逻辑的处理器，也可以看作是一个局部调度器，使go代码跑在线程上 再说几个相关概念：\nP列表：就是\bGOMAXPROCS这么多个P的列表 M列表：就是操作系统分配到当前go进程的内核线程数，可以通过runtime/debug包SetMaxThreads设置(一般比P多，但别超过10000个，如下) file: ***/src/runtime/proc.go ----------------------------- func schedinit() { ... sched.maxmcount = 10000 ... } 空闲P链表：当P的本地运行队列中的所有G都运行完毕, 又不能从其他地方拿到G时,拥有P的M会释放P并进入休眠状态, 释放的P会变为空闲状态并加到空闲P链表中, 空闲P链表保存在全局变量sched；下次待运行的G入队时如果发现有空闲的P, 但是又没有自旋中的M时会唤醒或者新建一个M, M会拥有这个P, P会重新变为运行中的状态 关于创建M，可以看下面的概念“保证有足够的M运行G” 空闲M链表：当M发现无待运行的G时会进入休眠, 并添加到空闲M链表中, 空闲M链表保存在全局变量sched；进入休眠的M会等待一个信号量(m.park), 唤醒休眠的M会使用这个信号量 P本地队列：P维护runq_，存放等待执行的goroutines，P本地队列是lock-free的，无竞争问题 M执行从P上获取的G时，如果创建了新的G，优先放在P的本地队列，如果P的本地队列满了，才放在全局队列 TODO：关于“如果P的本地队列满了，才放在全局队列”这句话，描述并不精确。真正的动作应该(个人臆测，需要看源码)是P将本地队列一半移动到全局队列(这个移动本地一半的动作不是臆测的)，而且应该是\"FIFO\"，将较早创建的一些G移动走，这个新建的G应该是放在了本地。首先来看本地队列和全局队列的关系，全局队列应该是一个大的缓冲池，均衡各个P的负载，同时，看起来还有一个作用，就是提高P缓存的命中率，全局队列应该是存储一些“冷G”，而各个P的本地应该是存储一些“热G”，所以本着这个原则，新建的应该尽量留在本地 本地队列容量: 256个 全局队列：全局的等待执行的goroutines队列 TODO：全局队列容量大小？ TODO：应该还有另一个全局的G队列，存放channel blocked goroutines，且也具备全局锁，下图有体现 M获取G： 首先从M关联的P的本地队列获取 若P本地队列空，则从全局队列获取 若全局队列也空，则从其他P的本地队列获取一部分任务放到关联P的本地队列(GMP的一个关键概念: work stealing，通常是偷来一半) 抢占式调度：当有很多goroutine需要执行的时候，P还未创建，在runtime.main中会创建一个额外m运行sysmon函数实现抢占。sysmon会进入一个无限循环, 第一轮休眠20us, 之后每次休眠时间倍增, 最终每一轮都会休眠10ms。 sysmon中有netpool(获取fd事件), retake(抢占), forcegc(按时间强制执行gc), scavenge heap(释放自由列表中多余的项减少内存占用)等处理 保证有足够的M运行G： 入队待运行的G后, 如果当前无自旋的M但是有空闲的P, 就唤醒或者新建一个M 当M离开自旋状态并准备运行出队的G时, 如果当前无自旋的M但是有空闲的P, 就唤醒或者新建一个M 当M离开自旋状态并准备休眠时, 会在离开自旋状态后再次检查所有运行队列, 如果有待运行的G则重新进入自旋状态 因为\"入队待运行的G\"和\"M离开自旋状态\"会同时进行, go会使用这样的检查顺序:入队待运行的G =\u003e 内存屏障 =\u003e 检查当前自旋的M数量 =\u003e 唤醒或者新建一个M减少当前自旋的M数量 =\u003e 内存屏障 =\u003e 检查所有运行队列是否有待运行的G =\u003e 休眠，这样可以保证不会出现待运行的G入队了, 也有空闲的资源P, 但无M去执行的情况 状态汇总 G _Gidle：刚刚被分配并且还没有被初始化，值为0，为创建goroutine后的默认值 _Grunnable： 没有执行代码，没有栈的所有权，存储在运行队列中，可能在某个P的本地队列或全局队列中 _Grunning： 正在执行代码的goroutine，拥有栈的所有权 _Gsyscall：正在执行系统调用，拥有栈的所有权，与P脱离，但是与某个M绑定，会在调用结束后被分配到运行队列 _Gwaiting：被阻塞的goroutine，阻塞在某个channel的发送或者接收队列 _Gdead： 当前goroutine未被使用，没有执行代码，可能有分配的栈，分布在空闲列表gFree，可能是一个刚刚初始化的goroutine，也可能是执行了goexit退出的goroutine _Gcopystac：栈正在被拷贝，没有执行代码，不在运行队列上，执行权在 _Gscan ： GC 正在扫描栈空间，没有执行代码，可以与其他状态同时存在 P _Pidle ：处理器没有运行用户代码或者调度器，被空闲队列或者改变其状态的结构持有，运行队列为空 _Prunning ：被线程 M 持有，并且正在执行用户代码或者调度器 _Psyscall：没有执行用户代码，当前线程陷入系统调用 _Pgcstop ：被线程 M 持有，当前处理器由于垃圾回收被停止 _Pdead ：当前处理器已经不被使用 M 自旋线程：处于运行状态但是没有可执行goroutine的线程，数量最多为GOMAXPROC，若是数量大于GOMAXPROC就会进入休眠 通俗点说，空闲的M最多跟P的数量一样多，这样任何P已绑定的M陷入syscall都能迅速获得新的空闲M，减少M重新分配带来的开销，但空闲M又不能过多，否则导致内核线程浪费 非自旋线程：处于运行状态有可执行goroutine的线程 休眠 TODO：休眠我理解应该是不自旋但是还没被回收的这个状态？ 关于P和M的创建时间 P一般在程序一开始，runtime确认了GOMAXPROCS后，就创建了相应的P。\n但是对于M，是按需创建的，比如P绑定的M阻塞了，且此时没有休眠的M或自旋的M，就会向内核申请新的M，M最多10000个，但是其实内核一般也不允许创建这么多线程，还是会收到内核的限制。\n有一个特殊的M在P创建之前就创建了，那就是运行sysmon的M。\n调度图解 下图来自Gao Chao的PPT go-runtime-scheduler ：\n我们来画一张通俗易懂的图： 如上图，GOMAXPROCS=3，有三个P，每个P分别绑定了一个M；P1的本地队列满，P2的本地队列空，P3本地队列不满不空；M队列目前有5个M，除了与P绑定的执行go代码的M，M4陷入syscall，M5空闲，M4完成任务后将自旋（自旋M不超过GOMAXPROCS），若此时M1、M2、M3中的某一个阻塞，则M4与P绑定开始执行用户逻辑；若无空闲or睡眠M，M1、M2、M3中的某一个阻塞，则将创建新的M6绑定对应P执行用户逻辑。\n关于G、M的状态流转：\n图中（1）：此时P3本地队列不满不空，新创建的goroutine优先加入本地队列 图中（2）：此时P1本地队列满，新创建的goroutine将加入到全局队列 PS：关于这个动作，上面“P本地队列”概念中有提出疑问 图中（3）：P2本地队列空，无G可执行，将从全局队列获取G TODO：会一次获取多少过来呢？本地容量的一半吗？ 图中（4）：该图未体现，假设全局队列也空，则将执行work stealing，P2从其他P的本地队列“偷”一部分G过来 TODO：一般偷一半，怎么选择跟哪个P偷呢，负载最高的一个吗？ 图中（5）：若P3+M3执行G31时，G31发生channel阻塞，则G31将脱离P3+M3，P3将调度新的G到M3执行 图中（6）：若P1+M1执行G11时，发生syscall，则M1和G11该将脱离P1，执行syscall P1此时寻找到空闲的M5并绑定，继续执行P1的本地队列；若无空闲M，需要创建or唤醒 M1+G11执行完syscall后，若P1仍未找到M(仍然为_Psyscall状态)，则M1继续绑定P1，否则M1自旋or休眠or被回收 执行过程 go func(){}创建G，优先存P本地队列，否则存全局队列(再墨迹一次这个疑问上面提过) P唤醒一个M，M从P的runq_弹出一个G，如果P本地队列空，从全局队列获取(此时应该会从全局队列加载一些G到P的本地队列)，如果全局队列也空，就去其他P偷取G放到自己的P的本地队列 M开始执行 若发生系统调用导致M阻塞，当前P本地队列还有其他G，则runtime会将M\u0026P分离，然后再获取一个M(空闲/唤醒/新建)与P绑定；阻塞调用完成后，M会去找刚才的P，如果刚才的P没有绑定其他M，则与之绑定，否则 自旋/睡眠/被回收 若由于channel阻塞当前G，该G会脱离当前的M和P，P会调度其他的G分配给M执行 TODO：阻塞完成后，G直接进全局队列还是优先刚才的P本地队列？ 销毁G，返回执行结果，M寻找新的G执行 M的执行过程简单概括就是：调用G对象-\u003e执行-\u003e清理线程→继续找新的G执行。 M执行过程中，随时会发生上下文切换。当发生上下文切换时，需要对执行现场进行保护，以便下次被调度执行时进行现场恢复。Go调度器M的栈保存在G对象上，只需要将M所需要的寄存器(SP、PC等)保存到G对象上就可以实现现场保护。当这些寄存器数据被保护起来，就随时可以做上下文切换了，在中断之前把现场保存起来。如果此时G任务还没有执行完，M可以将任务重新丢到P的任务队列，等待下一次被调度执行。当再次被调度执行时，M通过访问G的vdsoSP、vdsoPC寄存器进行现场恢复(从上次中断位置继续执行)。\n调度场景 Channel阻塞：当goroutine读写channel发生阻塞时候，会调用gopark函数，该G会脱离当前的M与P，调度器会执行schedule函数调度新的G到当前M 系统调用：当某个G、M由于系统调用陷入内核态时，该P就会脱离当前的M，此时P会更新自己的状态为Psyscall，M与G互相绑定，进行系统调用。结束以后若该P状态还是Psyscall，则直接关联该M和G，否则使用闲置的处理器处理该G TODO：若无闲置的处理器，该G、M怎么处理？G优先回刚才的P，其次全局，M 自旋/休眠/被回收 ？ 系统监控：当某个G在P上运行的时间超过10ms，或者P处于Psyscall状态过长等情况就会调用retake函数，触发新的调度 主动让出：G运行时间过长，会主动让出当前的P，更新状态为Grunnable，该P会调度队列中的其他G运行 TODO：若本地队列空呢？ GM -\u003e GMP GM演化为GMP一定是在进步的。 之前我们说过，GM两个比较显著的问题\n一个是sched.lock全局队列锁 GMP per-P维护本地队列，减少了全局G队列的锁竞争 一个是per-M本地缓存 GMP是per-P的mcache，避免了大量陷入系统调用M对内存的浪费 对于G空转的问题，GMP的per-P本地队列+workStealing模式，减少了G的空转，且新建G优先入P本地队列，提高缓存命中率。\n此外，GMP还有\"hand off\"机制，当M1+P1执行G1时进入syscall，则P1与M1解绑(M1执行G1 syscall)，与空闲的M2(空闲的/新申请)绑定并继续工作，M1执行完G1后，进入空闲，后续将被其他P使用或被回收。\n为什么使用GMP取代GM 为什么GM演变到了GMP呢？\n首先M是内核级线程，用户态无法进行调度和修改，借鉴GMP的思路，只能是M本地绑定一个队列。 那么为什么需要一个P层呢？\n如果没有P层，每个M维护本地队列：\n由于M不停创建，本地队列数量同时增多，此时的\"work stealing\"将极其复杂，甚至可能导致调度性能严重下降 per-M内存问题并没有得到解决 每个M本地队列中其他G会由于M的syscall而被阻塞，若引入\"hand off\"机制，那么M数量将增长更快 因此，引入P层，由P层维护本地队列，P数量代表并发度，per-P mcache缓存模式，这就完美的解决了上面说的问题(正所谓\"遇事不决加一层\")。\nG、M、P数量 G的数量理论上就是受内存的限制，一个G初始创建需2k的栈空间，后续根据需要会弹性连续增长，假设单机内存4G，那么理论上G数量上限约2,000,000，当然不可能内存全部给G，数量大概是这么个概念。\nM的数量按照go默认值最高10000个，也可通过debug.SetMaxThreads来设置，但是其实还受到操作系统的限制，因为每一个M就对应操作系统的一个内核级线程。一个正常的go进程M数量一般比P多(hand off机制，空转M数量最大GOMAXPROCS，sysmon回收时间间隔 等机制导致)。\nP的数量是通过GOMAXPROCS设置，一般使用单机逻辑核数，这是为了能够充分利用单机的多核并发，P的量也不是越多越好，P多了调度的开销也会增加，P的最佳数量一般通过大量的benchmark才能确定\nP数量不多，所以per-P缓存需要的空间不会成为P数量的瓶颈 参考材料 https://mp.weixin.qq.com/s/an7dml9NLOhqOZjEGLdEEw https://cloud.tencent.com/developer/article/1683211 https://blog.csdn.net/diaosssss/article/details/92830782 数据局部性: https://www.zhihu.com/question/25142664 ","wordCount":"1904","inLanguage":"en","image":"https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E","datePublished":"2021-08-21T00:00:00Z","dateModified":"2021-08-21T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://duck-dd.github.io/posts/2021-08-21-go-schedule/"},"publisher":{"@type":"Organization","name":"Duck","logo":{"@type":"ImageObject","url":"https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://duck-dd.github.io/ accesskey=h title="首页 (Alt + H)"><img src=https://duck-dd.github.io/apple-touch-icon.png alt aria-label=logo height=35>首页</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://duck-dd.github.io/categories/ title=分类><span>分类</span></a></li><li><a href=https://duck-dd.github.io/tags/ title=标签><span>标签</span></a></li><li><a href=https://duck-dd.github.io/about_me title=关于我><span>关于我</span></a></li><li><a href=https://duck-dd.github.io/about_space title=关于这里><span>关于这里</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://duck-dd.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://duck-dd.github.io/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">Golang schedule</h1><div class=post-meta><span title='2021-08-21 00:00:00 +0000 UTC'>2021-08-21</span>&nbsp;·&nbsp;创建于:&nbsp;2021-08-21&nbsp;·&nbsp;9 min&nbsp;·&nbsp;1904 words<div class=meta-item>&nbsp·&nbsp
+<a href=https://duck-dd.github.io/categories/cs/>CS</a></div><div class=meta-item>&nbsp·&nbsp
+<a href=https://duck-dd.github.io/tags/golang/>Golang</a>
+<span>,</span>
+<a href=https://duck-dd.github.io/tags/2021/>2021</a></div></div></header><aside id=toc-container class="toc-container wide"><div class=toc><details open><summary accesskey=c title="(Alt + C)"><span class=details>目录</span></summary><div class=inner><ul><li><a href=#%e5%86%99%e5%9c%a8%e5%89%8d%e9%9d%a2 aria-label=写在前面>写在前面</a></li><li><a href=#gm aria-label=GM>GM</a></li><li><a href=#gmp aria-label=GMP>GMP</a><ul><li><a href=#gmp%e6%a8%a1%e5%9e%8b%e7%9a%84%e4%b8%80%e4%ba%9b%e6%a6%82%e5%bf%b5 aria-label=GMP模型的一些概念>GMP模型的一些概念</a></li><li><a href=#%e7%8a%b6%e6%80%81%e6%b1%87%e6%80%bb aria-label=状态汇总>状态汇总</a></li><li><a href=#%e5%85%b3%e4%ba%8ep%e5%92%8cm%e7%9a%84%e5%88%9b%e5%bb%ba%e6%97%b6%e9%97%b4 aria-label=关于P和M的创建时间>关于P和M的创建时间</a></li><li><a href=#%e8%b0%83%e5%ba%a6%e5%9b%be%e8%a7%a3 aria-label=调度图解>调度图解</a></li><li><a href=#%e6%89%a7%e8%a1%8c%e8%bf%87%e7%a8%8b aria-label=执行过程>执行过程</a></li><li><a href=#%e8%b0%83%e5%ba%a6%e5%9c%ba%e6%99%af aria-label=调度场景>调度场景</a></li></ul></li><li><a href=#gm---gmp aria-label="GM -> GMP">GM -> GMP</a><ul><li><a href=#%e4%b8%ba%e4%bb%80%e4%b9%88%e4%bd%bf%e7%94%a8gmp%e5%8f%96%e4%bb%a3gm aria-label=为什么使用GMP取代GM>为什么使用GMP取代GM</a></li></ul></li><li><a href=#gmp%e6%95%b0%e9%87%8f aria-label=G、M、P数量>G、M、P数量</a></li><li><a href=#%e5%8f%82%e8%80%83%e6%9d%90%e6%96%99 aria-label=参考材料>参考材料</a></li></ul></div></details></div></aside><script>let activeElement,elements;window.addEventListener("DOMContentLoaded",function(){checkTocPosition(),elements=document.querySelectorAll("h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]"),activeElement=elements[0];const t=encodeURI(activeElement.getAttribute("id")).toLowerCase();document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active")},!1),window.addEventListener("resize",function(){checkTocPosition()},!1),window.addEventListener("scroll",()=>{activeElement=Array.from(elements).find(e=>{if(getOffsetTop(e)-window.pageYOffset>0&&getOffsetTop(e)-window.pageYOffset<window.innerHeight/2)return e})||activeElement,elements.forEach(e=>{const t=encodeURI(e.getAttribute("id")).toLowerCase();e===activeElement?document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active"):document.querySelector(`.inner ul li a[href="#${t}"]`).classList.remove("active")})},!1);const main=parseInt(getComputedStyle(document.body).getPropertyValue("--article-width"),10),toc=parseInt(getComputedStyle(document.body).getPropertyValue("--toc-width"),10),gap=parseInt(getComputedStyle(document.body).getPropertyValue("--gap"),10);function checkTocPosition(){const e=document.body.scrollWidth;e-main-toc*2-gap*4>0?document.getElementById("toc-container").classList.add("wide"):document.getElementById("toc-container").classList.remove("wide")}function getOffsetTop(e){if(!e.getClientRects().length)return 0;let t=e.getBoundingClientRect(),n=e.ownerDocument.defaultView;return t.top+n.pageYOffset}</script><div class=post-content><h2 id=写在前面>写在前面<a hidden class=anchor aria-hidden=true href=#写在前面>#</a></h2><p>runtime包实现了所有<code>goroutine scheduler</code>、<code>memory allocator</code>、<code>garbage collector</code>细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。</p><p>搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM->GMP演化后的材料。</p><h2 id=gm>GM<a hidden class=anchor aria-hidden=true href=#gm>#</a></h2><p>go1.1版本以前，调度使用GM模型，如下图所示。简单的理解GM模型，就是有一个始终执行的调度函数schedule不停的执行调度计算，当某个M的G执行完成了，调度器就把这个M放回M队列，可绑定执行其他G（如果某个M+G发生了syscall，那么本来并发度是通过M数量控制的，此时并发度就降低了？）；如果G执行过程中创建新的G，会将新的G放入到G全局可执行队列中。G全局可执行队列的操作有一把全局锁，这导致了各个M对G全局队列的操作存在严重的竞争。</p><p>下面这段完全是我的臆测，请别太相信：</p><hr><p>简单概括呢，所以可以认为有：</p><ul><li>G全局可执行队列(以下也可能简称G可执行队列)</li><li>M可用队列</li></ul><p>调度器要做的事就是：</p><ul><li>从G的可执行队列取G并从M的可用队列取M，将二者绑定开始执行G</li><li>对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用</li></ul><hr><p><img alt=GM-model loading=lazy src=/images/go-schedule/gm.png></p><p>那么GM模型有哪些问题呢？</p><ul><li>(<strong>重点问题</strong>)单一的全局mutex(sched.lock)和集中状态管理<ul><li>mutex需要保护所有与全局goroutine队列相关操作(创建、完成、重排等等)，竞争严重</li></ul></li><li>(<strong>重点问题</strong>)per-M内存(M.mcache)问题<ul><li>每个M都需要一个mcache，会导致资源消耗过大(每个mcache可以吸纳到2MB的内存缓存和其他缓存)<ul><li>举个栗子，一个陷入syscall的M并不需要使用cache，但是在全部的M中，陷入系统调用的M与执行goroutine的M的比例可能是<code>N:1(N>>1)</code>，这就导致了<code>N/(N+1)</code>比例的mcache在闲置</li></ul></li><li><strong>数据局部性差</strong>:<ul><li>举个栗子，M1执行G1，此时创建了G2，G2通常是立刻进入了G全局可执行队列，而此时M1还在执行G1，所以G2通常被其他M执行，但是G1和G2通常强相关，所以G2最好也在M1上执行，因为G2对M1的缓存命中率更高</li></ul></li></ul></li><li>goroutine传递问题<ul><li>goroutine(G)交接(G.nextg)，M之间会经常交接可运行的G</li><li>再通俗点说，就是G空转，本来能够好好在一个M上执行完，但是由于全局队列的存在，G一旦回全局队列了，下次就不知道被哪个M取走了，所以叫“空转”；M加载G的上下文是有开销的，所以空转会导致性能下降</li></ul></li><li>频繁的线程阻塞/解阻塞<ul><li>syscalls情况下，线程经常被阻塞和解阻塞，增加了很多额外开销</li><li>通俗点说，M+G syscall，M阻塞，syscall完成后，M解阻塞继续执行G（如果是通过M数量控制并发度，这是不是就导致了并发度降低？）</li></ul></li></ul><h2 id=gmp>GMP<a hidden class=anchor aria-hidden=true href=#gmp>#</a></h2><p>基于以上说的GM的问题，go1.1以后开始使用GMP调度模型。
+G、M、P的定义如下(***/src/runtime/runtime2.go)。</p><pre tabindex=0><code>type g struct {
+	// Stack parameters.
+	// stack describes the actual stack memory: [stack.lo, stack.hi).
+	// stackguard0 is the stack pointer compared in the Go stack growth prologue.
+	// It is stack.lo+StackGuard normally, but can be StackPreempt to trigger a preemption.
+	// stackguard1 is the stack pointer compared in the C stack growth prologue.
+	// It is stack.lo+StackGuard on g0 and gsignal stacks.
+	// It is ~0 on other goroutine stacks, to trigger a call to morestackc (and crash).
+	stack       stack   // offset known to runtime/cgo
+	stackguard0 uintptr // offset known to liblink
+	stackguard1 uintptr // offset known to liblink
+
+	_panic       *_panic // innermost panic - offset known to liblink
+	_defer       *_defer // innermost defer
+	m            *m      // current m; offset known to arm liblink
+	sched        gobuf
+	syscallsp    uintptr        // if status==Gsyscall, syscallsp = sched.sp to use during gc
+	syscallpc    uintptr        // if status==Gsyscall, syscallpc = sched.pc to use during gc
+	stktopsp     uintptr        // expected sp at top of stack, to check in traceback
+	param        unsafe.Pointer // passed parameter on wakeup
+	atomicstatus uint32
+	stackLock    uint32 // sigprof/scang lock; TODO: fold in to atomicstatus
+	goid         int64
+	schedlink    guintptr
+	waitsince    int64      // approx time when the g become blocked
+	waitreason   waitReason // if status==Gwaiting
+
+	preempt       bool // preemption signal, duplicates stackguard0 = stackpreempt
+	preemptStop   bool // transition to _Gpreempted on preemption; otherwise, just deschedule
+	preemptShrink bool // shrink stack at synchronous safe point
+
+	// asyncSafePoint is set if g is stopped at an asynchronous
+	// safe point. This means there are frames on the stack
+	// without precise pointer information.
+	asyncSafePoint bool
+
+	paniconfault bool // panic (instead of crash) on unexpected fault address
+	gcscandone   bool // g has scanned stack; protected by _Gscan bit in status
+	throwsplit   bool // must not split stack
+	// activeStackChans indicates that there are unlocked channels
+	// pointing into this goroutine&#39;s stack. If true, stack
+	// copying needs to acquire channel locks to protect these
+	// areas of the stack.
+	activeStackChans bool
+	// parkingOnChan indicates that the goroutine is about to
+	// park on a chansend or chanrecv. Used to signal an unsafe point
+	// for stack shrinking. It&#39;s a boolean value, but is updated atomically.
+	parkingOnChan uint8
+
+	raceignore     int8     // ignore race detection events
+	sysblocktraced bool     // StartTrace has emitted EvGoInSyscall about this goroutine
+	sysexitticks   int64    // cputicks when syscall has returned (for tracing)
+	traceseq       uint64   // trace event sequencer
+	tracelastp     puintptr // last P emitted an event for this goroutine
+	lockedm        muintptr
+	sig            uint32
+	writebuf       []byte
+	sigcode0       uintptr
+	sigcode1       uintptr
+	sigpc          uintptr
+	gopc           uintptr         // pc of go statement that created this goroutine
+	ancestors      *[]ancestorInfo // ancestor information goroutine(s) that created this goroutine (only used if debug.tracebackancestors)
+	startpc        uintptr         // pc of goroutine function
+	racectx        uintptr
+	waiting        *sudog         // sudog structures this g is waiting on (that have a valid elem ptr); in lock order
+	cgoCtxt        []uintptr      // cgo traceback context
+	labels         unsafe.Pointer // profiler labels
+	timer          *timer         // cached timer for time.Sleep
+	selectDone     uint32         // are we participating in a select and did someone win the race?
+
+	// Per-G GC state
+
+	// gcAssistBytes is this G&#39;s GC assist credit in terms of
+	// bytes allocated. If this is positive, then the G has credit
+	// to allocate gcAssistBytes bytes without assisting. If this
+	// is negative, then the G must correct this by performing
+	// scan work. We track this in bytes to make it fast to update
+	// and check for debt in the malloc hot path. The assist ratio
+	// determines how this corresponds to scan work debt.
+	gcAssistBytes int64
+}
+
+type m struct {
+	g0      *g     // goroutine with scheduling stack
+	morebuf gobuf  // gobuf arg to morestack
+	divmod  uint32 // div/mod denominator for arm - known to liblink
+
+	// Fields not known to debuggers.
+	procid        uint64       // for debuggers, but offset not hard-coded
+	gsignal       *g           // signal-handling g
+	goSigStack    gsignalStack // Go-allocated signal handling stack
+	sigmask       sigset       // storage for saved signal mask
+	tls           [6]uintptr   // thread-local storage (for x86 extern register)
+	mstartfn      func()
+	curg          *g       // current running goroutine
+	caughtsig     guintptr // goroutine running during fatal signal
+	p             puintptr // attached p for executing go code (nil if not executing go code)
+	nextp         puintptr
+	oldp          puintptr // the p that was attached before executing a syscall
+	id            int64
+	mallocing     int32
+	throwing      int32
+	preemptoff    string // if != &#34;&#34;, keep curg running on this m
+	locks         int32
+	dying         int32
+	profilehz     int32
+	spinning      bool // m is out of work and is actively looking for work
+	blocked       bool // m is blocked on a note
+	newSigstack   bool // minit on C thread called sigaltstack
+	printlock     int8
+	incgo         bool   // m is executing a cgo call
+	freeWait      uint32 // if == 0, safe to free g0 and delete m (atomic)
+	fastrand      [2]uint32
+	needextram    bool
+	traceback     uint8
+	ncgocall      uint64      // number of cgo calls in total
+	ncgo          int32       // number of cgo calls currently in progress
+	cgoCallersUse uint32      // if non-zero, cgoCallers in use temporarily
+	cgoCallers    *cgoCallers // cgo traceback if crashing in cgo call
+	park          note
+	alllink       *m // on allm
+	schedlink     muintptr
+	lockedg       guintptr
+	createstack   [32]uintptr // stack that created this thread.
+	lockedExt     uint32      // tracking for external LockOSThread
+	lockedInt     uint32      // tracking for internal lockOSThread
+	nextwaitm     muintptr    // next m waiting for lock
+	waitunlockf   func(*g, unsafe.Pointer) bool
+	waitlock      unsafe.Pointer
+	waittraceev   byte
+	waittraceskip int
+	startingtrace bool
+	syscalltick   uint32
+	freelink      *m // on sched.freem
+
+	// these are here because they are too large to be on the stack
+	// of low-level NOSPLIT functions.
+	libcall   libcall
+	libcallpc uintptr // for cpu profiler
+	libcallsp uintptr
+	libcallg  guintptr
+	syscall   libcall // stores syscall parameters on windows
+
+	vdsoSP uintptr // SP for traceback while in VDSO call (0 if not in call)
+	vdsoPC uintptr // PC for traceback while in VDSO call
+
+	// preemptGen counts the number of completed preemption
+	// signals. This is used to detect when a preemption is
+	// requested, but fails. Accessed atomically.
+	preemptGen uint32
+
+	// Whether this is a pending preemption signal on this M.
+	// Accessed atomically.
+	signalPending uint32
+
+	dlogPerM
+
+	mOS
+
+	// Up to 10 locks held by this m, maintained by the lock ranking code.
+	locksHeldLen int
+	locksHeld    [10]heldLockInfo
+}
+
+type p struct {
+	id          int32
+	status      uint32 // one of pidle/prunning/...
+	link        puintptr
+	schedtick   uint32     // incremented on every scheduler call
+	syscalltick uint32     // incremented on every system call
+	sysmontick  sysmontick // last tick observed by sysmon
+	m           muintptr   // back-link to associated m (nil if idle)
+	mcache      *mcache
+	pcache      pageCache
+	raceprocctx uintptr
+
+	deferpool    [5][]*_defer // pool of available defer structs of different sizes (see panic.go)
+	deferpoolbuf [5][32]*_defer
+
+	// Cache of goroutine ids, amortizes accesses to runtime·sched.goidgen.
+	goidcache    uint64
+	goidcacheend uint64
+
+	// Queue of runnable goroutines. Accessed without lock.
+	runqhead uint32
+	runqtail uint32
+	runq     [256]guintptr
+	// runnext, if non-nil, is a runnable G that was ready&#39;d by
+	// the current G and should be run next instead of what&#39;s in
+	// runq if there&#39;s time remaining in the running G&#39;s time
+	// slice. It will inherit the time left in the current time
+	// slice. If a set of goroutines is locked in a
+	// communicate-and-wait pattern, this schedules that set as a
+	// unit and eliminates the (potentially large) scheduling
+	// latency that otherwise arises from adding the ready&#39;d
+	// goroutines to the end of the run queue.
+	runnext guintptr
+
+	// Available G&#39;s (status == Gdead)
+	gFree struct {
+		gList
+		n int32
+	}
+
+	sudogcache []*sudog
+	sudogbuf   [128]*sudog
+
+	// Cache of mspan objects from the heap.
+	mspancache struct {
+		// We need an explicit length here because this field is used
+		// in allocation codepaths where write barriers are not allowed,
+		// and eliminating the write barrier/keeping it eliminated from
+		// slice updates is tricky, moreso than just managing the length
+		// ourselves.
+		len int
+		buf [128]*mspan
+	}
+
+	tracebuf traceBufPtr
+
+	// traceSweep indicates the sweep events should be traced.
+	// This is used to defer the sweep start event until a span
+	// has actually been swept.
+	traceSweep bool
+	// traceSwept and traceReclaimed track the number of bytes
+	// swept and reclaimed by sweeping in the current sweep loop.
+	traceSwept, traceReclaimed uintptr
+
+	palloc persistentAlloc // per-P to avoid mutex
+
+	_ uint32 // Alignment for atomic fields below
+
+	// The when field of the first entry on the timer heap.
+	// This is updated using atomic functions.
+	// This is 0 if the timer heap is empty.
+	timer0When uint64
+
+	// Per-P GC state
+	gcAssistTime         int64    // Nanoseconds in assistAlloc
+	gcFractionalMarkTime int64    // Nanoseconds in fractional mark worker (atomic)
+	gcBgMarkWorker       guintptr // (atomic)
+	gcMarkWorkerMode     gcMarkWorkerMode
+
+	// gcMarkWorkerStartTime is the nanotime() at which this mark
+	// worker started.
+	gcMarkWorkerStartTime int64
+
+	// gcw is this P&#39;s GC work buffer cache. The work buffer is
+	// filled by write barriers, drained by mutator assists, and
+	// disposed on certain GC state transitions.
+	gcw gcWork
+
+	// wbBuf is this P&#39;s GC write barrier buffer.
+	//
+	// TODO: Consider caching this in the running G.
+	wbBuf wbBuf
+
+	runSafePointFn uint32 // if 1, run sched.safePointFn at next safe point
+
+	// Lock for timers. We normally access the timers while running
+	// on this P, but the scheduler can also do it from a different P.
+	timersLock mutex
+
+	// Actions to take at some time. This is used to implement the
+	// standard library&#39;s time package.
+	// Must hold timersLock to access.
+	timers []*timer
+
+	// Number of timers in P&#39;s heap.
+	// Modified using atomic instructions.
+	numTimers uint32
+
+	// Number of timerModifiedEarlier timers on P&#39;s heap.
+	// This should only be modified while holding timersLock,
+	// or while the timer status is in a transient state
+	// such as timerModifying.
+	adjustTimers uint32
+
+	// Number of timerDeleted timers in P&#39;s heap.
+	// Modified using atomic instructions.
+	deletedTimers uint32
+
+	// Race context used while executing timer functions.
+	timerRaceCtx uintptr
+
+	// preempt is set to indicate that this P should be enter the
+	// scheduler ASAP (regardless of what G is running on it).
+	preempt bool
+
+	pad cpu.CacheLinePad
+}
+</code></pre><h3 id=gmp模型的一些概念>GMP模型的一些概念<a hidden class=anchor aria-hidden=true href=#gmp模型的一些概念>#</a></h3><p>上面M中有两个g需要关注下，curg和g0。
+curg就是M当前绑定的G。
+g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增长的栈，而g0的栈是M对应的线程的栈。所有调度相关的代码，会先切换到该goroutine的栈中执行。即，线程的栈也是用的g实现，而不是使用的OS。</p><p>反正上述定义我是没有逐个字段的去理解，还是靠嘴说吧：</p><ul><li>G(Goroutine): goroutine，<code>go func(){...}</code>创建的<ul><li>G会保存他关联的M</li><li>G会保存全局队列中下一个G(按链表理解)</li><li>G默认栈2KB</li><li>G保存上下文，现场保护&现场恢复的寄存器</li></ul></li><li>M(Machine): 抽象化代表内核线程<ul><li>M保存了自身的栈信息，当前M上执行的G信息，以及绑定的P信息</li><li>M有线程栈，若没有为M的线程栈提供内存，则操作系统会为M提供内存</li><li>当指定线程栈，则<code>M.stack->G.stack</code>，M的PC寄存器指向G提供的函数，然后开始执行</li></ul></li><li>P(Processor): 处理器，一般P的数量默认为机器逻辑核数(go早期版本默认值1)，可以通过GOMAXPROCS修改，P的数量其实就是并发量<ul><li>P负责调度goroutines，per-P维护一个本地goroutine队列，M从P获取goroutine并执行</li><li>per-P维护一个本地mcache<ul><li>TODO：这个点怎么理解？</li></ul></li><li>综上呢，P是M执行所需要的上下文环境，是处理用户级代码逻辑的处理器，也可以看作是一个局部调度器，使go代码跑在线程上</li></ul></li></ul><p>再说几个相关概念：</p><ul><li>P列表：就是GOMAXPROCS这么多个P的列表</li><li>M列表：就是操作系统分配到当前go进程的内核线程数，可以通过runtime/debug包SetMaxThreads设置(一般比P多，但别超过10000个，如下)<pre tabindex=0><code>file: ***/src/runtime/proc.go
+-----------------------------
+  func schedinit() {
+        ...
+       sched.maxmcount = 10000
+       ...
+  }
+</code></pre></li><li>空闲P链表：当P的本地运行队列中的所有G都运行完毕, 又不能从其他地方拿到G时,拥有P的M会释放P并进入休眠状态, 释放的P会变为空闲状态并加到空闲P链表中, 空闲P链表保存在全局变量sched；下次待运行的G入队时如果发现有空闲的P, 但是又没有自旋中的M时会唤醒或者新建一个M, M会拥有这个P, P会重新变为运行中的状态<ul><li>关于创建M，可以看下面的概念“保证有足够的M运行G”</li></ul></li><li>空闲M链表：当M发现无待运行的G时会进入休眠, 并添加到空闲M链表中, 空闲M链表保存在全局变量sched；进入休眠的M会等待一个信号量(m.park), 唤醒休眠的M会使用这个信号量</li><li>P本地队列：P维护runq_，存放等待执行的goroutines，P本地队列是lock-free的，无竞争问题<ul><li>M执行从P上获取的G时，如果创建了新的G，优先放在P的本地队列，如果P的本地队列满了，才放在全局队列<ul><li>TODO：关于“如果P的本地队列满了，才放在全局队列”这句话，描述并不精确。真正的动作应该(个人臆测，需要看源码)是P将本地队列一半移动到全局队列(这个移动本地一半的动作不是臆测的)，而且应该是"FIFO"，将较早创建的一些G移动走，这个新建的G应该是放在了本地。首先来看本地队列和全局队列的关系，全局队列应该是一个大的缓冲池，均衡各个P的负载，同时，看起来还有一个作用，就是提高P缓存的命中率，全局队列应该是存储一些“冷G”，而各个P的本地应该是存储一些“热G”，所以本着这个原则，新建的应该尽量留在本地</li></ul></li><li>本地队列容量: 256个</li></ul></li><li>全局队列：全局的等待执行的goroutines队列<ul><li>TODO：全局队列容量大小？</li></ul></li><li>TODO：应该还有另一个全局的G队列，存放channel blocked goroutines，且也具备全局锁，下图有体现</li><li>M获取G：<ul><li>首先从M关联的P的本地队列获取</li><li>若P本地队列空，则从全局队列获取</li><li>若全局队列也空，则<strong>从其他P的本地队列获取一部分任务放到关联P的本地队列(GMP的一个关键概念: work stealing，通常是偷来一半)</strong></li></ul></li><li>抢占式调度：当有很多goroutine需要执行的时候，P还未创建，在runtime.main中会创建一个额外m运行sysmon函数实现抢占。sysmon会进入一个无限循环, 第一轮休眠20us, 之后每次休眠时间倍增, 最终每一轮都会休眠10ms。 sysmon中有netpool(获取fd事件), retake(抢占), forcegc(按时间强制执行gc), scavenge heap(释放自由列表中多余的项减少内存占用)等处理</li><li>保证有足够的M运行G：<ul><li>入队待运行的G后, 如果当前无自旋的M但是有空闲的P, 就唤醒或者新建一个M</li><li>当M离开自旋状态并准备运行出队的G时, 如果当前无自旋的M但是有空闲的P, 就唤醒或者新建一个M</li><li>当M离开自旋状态并准备休眠时, 会在离开自旋状态后再次检查所有运行队列, 如果有待运行的G则重新进入自旋状态</li><li>因为"入队待运行的G"和"M离开自旋状态"会同时进行, go会使用这样的检查顺序:<code>入队待运行的G => 内存屏障 => 检查当前自旋的M数量 => 唤醒或者新建一个M减少当前自旋的M数量 => 内存屏障 => 检查所有运行队列是否有待运行的G => 休眠</code>，这样可以保证不会出现待运行的G入队了, 也有空闲的资源P, 但无M去执行的情况</li></ul></li></ul><h3 id=状态汇总>状态汇总<a hidden class=anchor aria-hidden=true href=#状态汇总>#</a></h3><ul><li>G<ul><li>_Gidle：刚刚被分配并且还没有被初始化，值为0，为创建goroutine后的默认值</li><li>_Grunnable： 没有执行代码，没有栈的所有权，存储在运行队列中，可能在某个P的本地队列或全局队列中</li><li>_Grunning： 正在执行代码的goroutine，拥有栈的所有权</li><li>_Gsyscall：正在执行系统调用，拥有栈的所有权，与P脱离，但是与某个M绑定，会在调用结束后被分配到运行队列</li><li>_Gwaiting：被阻塞的goroutine，阻塞在某个channel的发送或者接收队列</li><li>_Gdead： 当前goroutine未被使用，没有执行代码，可能有分配的栈，分布在空闲列表gFree，可能是一个刚刚初始化的goroutine，也可能是执行了goexit退出的goroutine</li><li>_Gcopystac：栈正在被拷贝，没有执行代码，不在运行队列上，执行权在</li><li>_Gscan ： GC 正在扫描栈空间，没有执行代码，可以与其他状态同时存在</li></ul></li><li>P<ul><li>_Pidle ：处理器没有运行用户代码或者调度器，被空闲队列或者改变其状态的结构持有，运行队列为空</li><li>_Prunning ：被线程 M 持有，并且正在执行用户代码或者调度器</li><li>_Psyscall：没有执行用户代码，当前线程陷入系统调用</li><li>_Pgcstop ：被线程 M 持有，当前处理器由于垃圾回收被停止</li><li>_Pdead ：当前处理器已经不被使用</li></ul></li><li>M<ul><li>自旋线程：处于运行状态但是没有可执行goroutine的线程，数量最多为GOMAXPROC，若是数量大于GOMAXPROC就会进入休眠<ul><li>通俗点说，空闲的M最多跟P的数量一样多，这样任何P已绑定的M陷入syscall都能迅速获得新的空闲M，减少M重新分配带来的开销，但空闲M又不能过多，否则导致内核线程浪费</li></ul></li><li>非自旋线程：处于运行状态有可执行goroutine的线程</li><li>休眠<ul><li>TODO：休眠我理解应该是不自旋但是还没被回收的这个状态？</li></ul></li></ul></li></ul><h3 id=关于p和m的创建时间>关于P和M的创建时间<a hidden class=anchor aria-hidden=true href=#关于p和m的创建时间>#</a></h3><p>P一般在程序一开始，runtime确认了GOMAXPROCS后，就创建了相应的P。</p><p>但是对于M，是按需创建的，比如P绑定的M阻塞了，且此时没有休眠的M或自旋的M，就会向内核申请新的M，M最多10000个，但是其实内核一般也不允许创建这么多线程，还是会收到内核的限制。</p><p>有一个特殊的M在P创建之前就创建了，那就是运行sysmon的M。</p><h3 id=调度图解>调度图解<a hidden class=anchor aria-hidden=true href=#调度图解>#</a></h3><p>下图来自Gao Chao的PPT <a href="https://speakerdeck.com/retervision/go-runtime-scheduler?slide=14">go-runtime-scheduler</a> ：</p><p><img alt=gmp-sched loading=lazy src=/images/go-schedule/gmp-sched.png>
+我们来画一张通俗易懂的图：
+<img alt=gmp loading=lazy src=/images/go-schedule/gmp.png></p><p>如上图，GOMAXPROCS=3，有三个P，每个P分别绑定了一个M；P1的本地队列满，P2的本地队列空，P3本地队列不满不空；M队列目前有5个M，除了与P绑定的执行go代码的M，M4陷入syscall，M5空闲，M4完成任务后将自旋（自旋M不超过GOMAXPROCS），若此时M1、M2、M3中的某一个阻塞，则M4与P绑定开始执行用户逻辑；若无空闲or睡眠M，M1、M2、M3中的某一个阻塞，则将创建新的M6绑定对应P执行用户逻辑。</p><p>关于G、M的状态流转：</p><ul><li>图中（1）：此时P3本地队列不满不空，新创建的goroutine优先加入本地队列</li><li>图中（2）：此时P1本地队列满，新创建的goroutine将加入到全局队列<ul><li>PS：关于这个动作，上面“P本地队列”概念中有提出疑问</li></ul></li><li>图中（3）：P2本地队列空，无G可执行，将从全局队列获取G<ul><li>TODO：会一次获取多少过来呢？本地容量的一半吗？</li></ul></li><li>图中（4）：该图未体现，假设全局队列也空，则将执行work stealing，P2从其他P的本地队列“偷”一部分G过来<ul><li>TODO：一般偷一半，怎么选择跟哪个P偷呢，负载最高的一个吗？</li></ul></li><li>图中（5）：若P3+M3执行G31时，G31发生channel阻塞，则G31将脱离P3+M3，P3将调度新的G到M3执行</li><li>图中（6）：若P1+M1执行G11时，发生syscall，则M1和G11该将脱离P1，执行syscall<ul><li>P1此时寻找到空闲的M5并绑定，继续执行P1的本地队列；若无空闲M，需要创建or唤醒</li><li>M1+G11执行完syscall后，若P1仍未找到M(仍然为_Psyscall状态)，则M1继续绑定P1，否则M1自旋or休眠or被回收</li></ul></li></ul><h3 id=执行过程>执行过程<a hidden class=anchor aria-hidden=true href=#执行过程>#</a></h3><ul><li><code>go func(){}</code>创建G，优先存P本地队列，否则存全局队列(再墨迹一次这个疑问上面提过)</li><li>P唤醒一个M，M从P的runq_弹出一个G，如果P本地队列空，从全局队列获取(此时应该会从全局队列加载一些G到P的本地队列)，如果全局队列也空，就去其他P偷取G放到自己的P的本地队列</li><li>M开始执行<ul><li>若发生系统调用导致M阻塞，当前P本地队列还有其他G，则runtime会将M&amp;P分离，然后再获取一个M(空闲/唤醒/新建)与P绑定；阻塞调用完成后，M会去找刚才的P，如果刚才的P没有绑定其他M，则与之绑定，否则 自旋/睡眠/被回收</li><li>若由于channel阻塞当前G，该G会脱离当前的M和P，P会调度其他的G分配给M执行<ul><li>TODO：阻塞完成后，G直接进全局队列还是优先刚才的P本地队列？</li></ul></li></ul></li><li>销毁G，返回执行结果，M寻找新的G执行</li></ul><p>M的执行过程简单概括就是：调用G对象->执行->清理线程→继续找新的G执行。
+M执行过程中，随时会发生上下文切换。当发生上下文切换时，需要对执行现场进行保护，以便下次被调度执行时进行现场恢复。Go调度器M的栈保存在G对象上，只需要将M所需要的寄存器(SP、PC等)保存到G对象上就可以实现现场保护。当这些寄存器数据被保护起来，就随时可以做上下文切换了，在中断之前把现场保存起来。如果此时G任务还没有执行完，M可以将任务重新丢到P的任务队列，等待下一次被调度执行。当再次被调度执行时，M通过访问G的vdsoSP、vdsoPC寄存器进行现场恢复(从上次中断位置继续执行)。</p><h3 id=调度场景>调度场景<a hidden class=anchor aria-hidden=true href=#调度场景>#</a></h3><ul><li>Channel阻塞：当goroutine读写channel发生阻塞时候，会调用gopark函数，该G会脱离当前的M与P，调度器会执行schedule函数调度新的G到当前M</li><li>系统调用：当某个G、M由于系统调用陷入内核态时，该P就会脱离当前的M，此时P会更新自己的状态为Psyscall，M与G互相绑定，进行系统调用。结束以后若该P状态还是Psyscall，则直接关联该M和G，否则使用闲置的处理器处理该G<ul><li>TODO：若无闲置的处理器，该G、M怎么处理？G优先回刚才的P，其次全局，M 自旋/休眠/被回收 ？</li></ul></li><li>系统监控：当某个G在P上运行的时间超过10ms，或者P处于Psyscall状态过长等情况就会调用retake函数，触发新的调度</li><li>主动让出：G运行时间过长，会主动让出当前的P，更新状态为Grunnable，该P会调度队列中的其他G运行<ul><li>TODO：若本地队列空呢？</li></ul></li></ul><h2 id=gm---gmp>GM -> GMP<a hidden class=anchor aria-hidden=true href=#gm---gmp>#</a></h2><p>GM演化为GMP一定是在进步的。
+之前我们说过，GM两个比较显著的问题</p><ul><li>一个是sched.lock全局队列锁<ul><li>GMP per-P维护本地队列，减少了全局G队列的锁竞争</li></ul></li><li>一个是per-M本地缓存<ul><li>GMP是per-P的mcache，避免了大量陷入系统调用M对内存的浪费</li></ul></li></ul><p>对于G空转的问题，GMP的per-P本地队列+workStealing模式，减少了G的空转，且新建G优先入P本地队列，提高缓存命中率。</p><p>此外，GMP还有"hand off"机制，当M1+P1执行G1时进入syscall，则P1与M1解绑(M1执行G1 syscall)，与空闲的M2(空闲的/新申请)绑定并继续工作，M1执行完G1后，进入空闲，后续将被其他P使用或被回收。</p><h3 id=为什么使用gmp取代gm>为什么使用GMP取代GM<a hidden class=anchor aria-hidden=true href=#为什么使用gmp取代gm>#</a></h3><p>为什么GM演变到了GMP呢？</p><p>首先M是内核级线程，用户态无法进行调度和修改，借鉴GMP的思路，只能是M本地绑定一个队列。
+那么为什么需要一个P层呢？</p><p>如果没有P层，每个M维护本地队列：</p><ul><li>由于M不停创建，本地队列数量同时增多，此时的"work stealing"将极其复杂，甚至可能导致调度性能严重下降</li><li>per-M内存问题并没有得到解决</li><li>每个M本地队列中其他G会由于M的syscall而被阻塞，若引入"hand off"机制，那么M数量将增长更快</li></ul><p>因此，引入P层，由P层维护本地队列，P数量代表并发度，per-P mcache缓存模式，这就完美的解决了上面说的问题(正所谓"遇事不决加一层")。</p><h2 id=gmp数量>G、M、P数量<a hidden class=anchor aria-hidden=true href=#gmp数量>#</a></h2><p>G的数量理论上就是受内存的限制，一个G初始创建需2k的栈空间，后续根据需要会弹性连续增长，假设单机内存4G，那么理论上G数量上限约<code>2,000,000</code>，当然不可能内存全部给G，数量大概是这么个概念。</p><p>M的数量按照go默认值最高10000个，也可通过<code>debug.SetMaxThreads</code>来设置，但是其实还受到操作系统的限制，因为每一个M就对应操作系统的一个内核级线程。一个正常的go进程M数量一般比P多(hand off机制，空转M数量最大GOMAXPROCS，sysmon回收时间间隔 等机制导致)。</p><p>P的数量是通过<code>GOMAXPROCS</code>设置，一般使用单机逻辑核数，这是为了能够充分利用单机的多核并发，P的量也不是越多越好，P多了调度的开销也会增加，P的最佳数量一般通过大量的benchmark才能确定</p><ul><li>P数量不多，所以per-P缓存需要的空间不会成为P数量的瓶颈</li></ul><h2 id=参考材料>参考材料<a hidden class=anchor aria-hidden=true href=#参考材料>#</a></h2><ul><li><a href=https://mp.weixin.qq.com/s/an7dml9NLOhqOZjEGLdEEw>https://mp.weixin.qq.com/s/an7dml9NLOhqOZjEGLdEEw</a></li><li><a href=https://cloud.tencent.com/developer/article/1683211>https://cloud.tencent.com/developer/article/1683211</a></li><li><a href=https://blog.csdn.net/diaosssss/article/details/92830782>https://blog.csdn.net/diaosssss/article/details/92830782</a></li><li>数据局部性: <a href=https://www.zhihu.com/question/25142664>https://www.zhihu.com/question/25142664</a></li></ul></div><footer class=post-footer><ul class=post-tags><li><a href=https://duck-dd.github.io/tags/golang/>Golang</a></li><li><a href=https://duck-dd.github.io/tags/2021/>2021</a></li></ul><nav class=paginav><a class=prev href=https://duck-dd.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/><span class=title>« Prev</span><br><span>golang select case机会均等</span>
+</a><a class=next href=https://duck-dd.github.io/posts/2021-08-19-happens-before/><span class=title>Next »</span><br><span>happens-before</span></a></nav></footer><script src=https://utteranc.es/client.js repo=duck-dd/blog-comment issue-term=pathname label='💬 Comments' theme=github-light crossorigin=anonymous async></script></article></main><footer class=footer><span>&copy; 2025 <a href=https://duck-dd.github.io/>Duck</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$",right:"$",display:!1},{left:"$$",right:"$$",display:!0}],throwOnError:!1})})</script></body></html>

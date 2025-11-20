@@ -15,9 +15,9 @@
     <atom:link href="https://duck-dd.github.io/tags/2022/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>golang select case机会均等</title>
-      <link>https://duck-dd.github.io/posts/golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</link>
+      <link>https://duck-dd.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</link>
       <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</guid>
+      <guid>https://duck-dd.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</guid>
       <description>&lt;h1 id=&#34;验证&#34;&gt;验证&lt;/h1&gt;
 &lt;p&gt;我们每天都在使用下面这样的用法，对于这种多条件分支判定，我们从来不会指定权重，按固有思维，多条件间应该是机会均等的，那么golang如何做的呢？&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;select {

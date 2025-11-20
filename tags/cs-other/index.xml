@@ -15,9 +15,9 @@
     <atom:link href="https://duck-dd.github.io/tags/cs-other/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>相似度</title>
-      <link>https://duck-dd.github.io/posts/%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
+      <link>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
       <pubDate>Tue, 03 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
       <description>&lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;用于衡量多个对象（如文本、数值向量、图像、序列等）之间相似程度的数学方法。&lt;/p&gt;
 &lt;p&gt;在计算机领域，通常将 “相似性” 转化为可计算的数值（例如 0~1 表示，1代表完全相似，0代表完全不相似）。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;的应用十分广泛，例如推荐系统（如商品/内容推荐）、数据挖掘（如聚类、分类）、NLP（如文本查重、语义匹配）、图像识别等。&lt;/p&gt;
@@ -169,9 +169,9 @@ or 向量间欧式距离
     </item>
     <item>
       <title>软件架构设计原则</title>
-      <link>https://duck-dd.github.io/posts/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</link>
+      <link>https://duck-dd.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</link>
       <pubDate>Sun, 16 Apr 2023 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</guid>
+      <guid>https://duck-dd.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</guid>
       <description>&lt;p&gt;每次接手一些老旧系统，总是很头疼，最近想，会不会别人接手了我的系统以后也是一样的感受，想到可能有人每天都在吐槽(骂)我头皮发麻啊&amp;hellip;&lt;/p&gt;
 &lt;p&gt;知易行难，其实怎么做好一个后端服务大家都是门清的，只是受限于 &lt;code&gt;排期&lt;/code&gt; &lt;code&gt;业务价值&lt;/code&gt; &lt;code&gt;协作&lt;/code&gt; 等太多因素，往往事与愿违。只能说但行好事莫问前程吧，下面再把这些原则列一下，时刻提醒自己吧；以下原则从个人角度分先后，不是说有重要性区别，而是有些原则很高频，或者很容易被忽略，需要时刻牢记。&lt;/p&gt;
 &lt;h1 id=&#34;一-职责逻辑-清晰&#34;&gt;一 职责/逻辑 清晰&lt;/h1&gt;
@@ -209,19 +209,19 @@ or 向量间欧式距离
     </item>
     <item>
       <title>happens-before</title>
-      <link>https://duck-dd.github.io/posts/happens-before/</link>
+      <link>https://duck-dd.github.io/posts/2021-08-19-happens-before/</link>
       <pubDate>Thu, 19 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/happens-before/</guid>
+      <guid>https://duck-dd.github.io/posts/2021-08-19-happens-before/</guid>
       <description>&lt;p&gt;在并发系统中，用于描述事件执行顺序关系；若事件A &amp;ldquo;happens-before&amp;rdquo; 事件B，则A的执行结果对B可见，且A在逻辑上先于B执行(并不要求在物理时间上A必须先于B执行)。&lt;/p&gt;
 &lt;p&gt;所以这其实是一种逻辑关系，在并发系统中，P1 P2 两个过程在逻辑上&amp;quot;同时&amp;quot;在执行，P2过程中的事件B依赖P1过程中的事件A的结果，那么就需要逻辑上的 &amp;ldquo;happens-before&amp;rdquo; 来确保A&amp;amp;B间的依赖关系。&lt;/p&gt;
 &lt;p&gt;常见的并发模型 &lt;strong&gt;共享内存&lt;/strong&gt; 和 &lt;strong&gt;消息传递&lt;/strong&gt;，都遵循 &amp;ldquo;happens-before&amp;quot;逻辑，消息传递中的happens-before好理解，消息的传入肯定是在消息的接收之前的，在共享内存模型的并发中，happens-before就是帮助我们在逻辑上自洽，理清楚不同并发单元(线程 协程 等)对某一个共享内存变量的操作顺序。&lt;/p&gt;</description>
     </item>
     <item>
       <title>DNS</title>
-      <link>https://duck-dd.github.io/posts/dns/</link>
+      <link>https://duck-dd.github.io/posts/2021-05-13-dns/</link>
       <pubDate>Thu, 13 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/dns/</guid>
-      <description>&lt;h1 id=&#34;dns挺好啥是dns&#34;&gt;DNS，挺好，啥是DNS？&lt;/h1&gt;
+      <guid>https://duck-dd.github.io/posts/2021-05-13-dns/</guid>
+      <description>&lt;h1 id=&#34;dns&#34;&gt;DNS？&lt;/h1&gt;
 &lt;h2 id=&#34;一些概念&#34;&gt;一些概念&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;FQDN: Fully Qualified Domain Name，全限定域名，同时带有主机名和域名的名称（通过符号“.”），例如一个FQDN是www.baidu.com，www是主机名，baidu.com是域名。再举例，我是海淀吴彦祖，你是**吴彦祖，但是我们还知道，有个人就叫吴彦祖，这么多吴彦祖我们都没有混淆，因为名字前面加上了地域，也就是域名。从逻辑上看FQDN，就是主机名的完整表达，类似绝对路径，通过一个FQDN我们可以在全网内锁定主机位置。&lt;/li&gt;

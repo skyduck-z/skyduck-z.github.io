@@ -15,9 +15,9 @@
     <atom:link href="https://duck-dd.github.io/tags/algorithm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>MCMF from scratch</title>
-      <link>https://duck-dd.github.io/posts/mcmf/</link>
+      <link>https://duck-dd.github.io/posts/2025-06-24-mcmf/</link>
       <pubDate>Tue, 24 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/mcmf/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-06-24-mcmf/</guid>
       <description>&lt;p&gt;需要深度用到MCMF了，但是摸了摸自己的脑门，脑子里没有公式和演算，只剩几个概念了。
 记录一下我从使用的角度理解MCMF问题(东拼西凑)的过程；某些定理的推导，或者复杂度的计算原理，不会深扒；顺便说个感悟，在feed如此丰富的今天，我们还是应该时刻锻炼传统手艺，保留信息检索、过滤、沉淀的能力，否则可能会越走越远(挺简单个问题一开始看偏了太难理解了)。&lt;/p&gt;
 &lt;h1 id=&#34;mcmf概念&#34;&gt;MCMF概念&lt;/h1&gt;
@@ -58,9 +58,9 @@
     </item>
     <item>
       <title>The Shortest Path</title>
-      <link>https://duck-dd.github.io/posts/shortest-path/</link>
+      <link>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</link>
       <pubDate>Mon, 23 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/shortest-path/</guid>
+      <guid>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</guid>
       <description>&lt;h1 id=&#34;最短路径问题&#34;&gt;最短路径问题&lt;/h1&gt;
 &lt;p&gt;寻找有向图中两个顶点之间的路径，使得 &lt;code&gt;路径最短&lt;/code&gt; 或 &lt;code&gt;路径上各边的权重之和最小&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;1-无权图最短路径&#34;&gt;1 无权图最短路径&lt;/h2&gt;

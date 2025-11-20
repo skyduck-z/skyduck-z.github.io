@@ -1,0 +1,371 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>golang singleflight | Duck</title><meta name=keywords content="Golang,2025"><meta name=description content='高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。
+通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：golang.org/x/sync/singleflight。
+如下面的例子，doSth有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起doSth的index是可控的，然后我们看到输出实际doSth只执行了一次，所有routine共享了同一份结果。
+PS：所有的shared返回值都是true，可能并不是大脑第一印象的第一个实际执行者是false，其他人是true
+package main
+
+import (
+	"fmt"
+	"sync"
+	"sync/atomic"
+	"time"
+	"golang.org/x/sync/singleflight"
+)
+
+func doSth(index int) (any, error) {
+	time.Sleep(2 * time.Second)
+	return fmt.Sprintf("result_%d", index), nil
+}
+
+func main() {
+	var g singleflight.Group
+	var wg sync.WaitGroup
+	var doCount int32 
+
+	for i := 100; i < 101; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do("key", func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf("index:%d, v: %v, err: %v\n", index, v, e)
+				return v,e
+			})
+			fmt.Printf("index:%d, ret:%v, shared:%v, err:%v\n", index, ret, shared, err)
+		}()
+	}
+	
+	
+	time.Sleep(time.Second)
+	
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do("key", func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf("index:%d, v: %v, err: %v\n", index, v, e)
+				return v,e
+			})
+			fmt.Printf("index:%d, ret:%v, shared:%v, err:%v\n", index, ret, shared, err)
+		}()
+	}
+	
+	wg.Wait()
+	
+	fmt.Printf("实际执行次数: %d\n", doCount)
+}
+
+------
+output:
+
+index:100, v: result_100, err: <nil>
+index:100, ret:result_100, shared:true, err:<nil>
+index:0, ret:result_100, shared:true, err:<nil>
+index:4, ret:result_100, shared:true, err:<nil>
+index:2, ret:result_100, shared:true, err:<nil>
+index:3, ret:result_100, shared:true, err:<nil>
+index:1, ret:result_100, shared:true, err:<nil>
+实际执行次数: 1
+真正发起共享的函数Do入参是有key的，我们把key做个替换，会发现不同key之间不共享，如下：'><meta name=author content><link rel=canonical href=https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/><meta name=google-site-verification content="XYZabc"><meta name=yandex-verification content="XYZabc"><meta name=msvalidate.01 content="XYZabc"><link crossorigin=anonymous href=/assets/css/stylesheet.2a8ef18cccda149eb1cd8ec968ba463447d72022979e5c5cae43dcf5d7358750.css integrity="sha256-Ko7xjMzaFJ6xzY7JaLpGNEfXICKXnlxcrkPc9dc1h1A=" rel="preload stylesheet" as=style><link rel=icon href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=16x16 href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=32x32 href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=apple-touch-icon href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><link rel=mask-icon href=https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous></script><meta property="og:url" content="https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/"><meta property="og:site_name" content="Duck"><meta property="og:title" content="golang singleflight"><meta property="og:description" content='高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。
+通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：golang.org/x/sync/singleflight。
+如下面的例子，doSth有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起doSth的index是可控的，然后我们看到输出实际doSth只执行了一次，所有routine共享了同一份结果。 PS：所有的shared返回值都是true，可能并不是大脑第一印象的第一个实际执行者是false，其他人是true
+package main import ( "fmt" "sync" "sync/atomic" "time" "golang.org/x/sync/singleflight" ) func doSth(index int) (any, error) { time.Sleep(2 * time.Second) return fmt.Sprintf("result_%d", index), nil } func main() { var g singleflight.Group var wg sync.WaitGroup var doCount int32 for i := 100; i < 101; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do("key", func() (interface{}, error) { atomic.AddInt32(&amp;doCount, 1) v,e := doSth(index) fmt.Printf("index:%d, v: %v, err: %v\n", index, v, e) return v,e }) fmt.Printf("index:%d, ret:%v, shared:%v, err:%v\n", index, ret, shared, err) }() } time.Sleep(time.Second) for i := 0; i < 5; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do("key", func() (interface{}, error) { atomic.AddInt32(&amp;doCount, 1) v,e := doSth(index) fmt.Printf("index:%d, v: %v, err: %v\n", index, v, e) return v,e }) fmt.Printf("index:%d, ret:%v, shared:%v, err:%v\n", index, ret, shared, err) }() } wg.Wait() fmt.Printf("实际执行次数: %d\n", doCount) } ------ output: index:100, v: result_100, err: <nil> index:100, ret:result_100, shared:true, err:<nil> index:0, ret:result_100, shared:true, err:<nil> index:4, ret:result_100, shared:true, err:<nil> index:2, ret:result_100, shared:true, err:<nil> index:3, ret:result_100, shared:true, err:<nil> index:1, ret:result_100, shared:true, err:<nil> 实际执行次数: 1 真正发起共享的函数Do入参是有key的，我们把key做个替换，会发现不同key之间不共享，如下：'><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-04-05T00:00:00+00:00"><meta property="article:modified_time" content="2025-04-05T00:00:00+00:00"><meta property="article:tag" content="Golang"><meta property="article:tag" content="2025"><meta property="og:image" content="https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="golang singleflight"><meta name=twitter:description content='高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。
+通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：golang.org/x/sync/singleflight。
+如下面的例子，doSth有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起doSth的index是可控的，然后我们看到输出实际doSth只执行了一次，所有routine共享了同一份结果。
+PS：所有的shared返回值都是true，可能并不是大脑第一印象的第一个实际执行者是false，其他人是true
+package main
+
+import (
+	"fmt"
+	"sync"
+	"sync/atomic"
+	"time"
+	"golang.org/x/sync/singleflight"
+)
+
+func doSth(index int) (any, error) {
+	time.Sleep(2 * time.Second)
+	return fmt.Sprintf("result_%d", index), nil
+}
+
+func main() {
+	var g singleflight.Group
+	var wg sync.WaitGroup
+	var doCount int32 
+
+	for i := 100; i < 101; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do("key", func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf("index:%d, v: %v, err: %v\n", index, v, e)
+				return v,e
+			})
+			fmt.Printf("index:%d, ret:%v, shared:%v, err:%v\n", index, ret, shared, err)
+		}()
+	}
+	
+	
+	time.Sleep(time.Second)
+	
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do("key", func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf("index:%d, v: %v, err: %v\n", index, v, e)
+				return v,e
+			})
+			fmt.Printf("index:%d, ret:%v, shared:%v, err:%v\n", index, ret, shared, err)
+		}()
+	}
+	
+	wg.Wait()
+	
+	fmt.Printf("实际执行次数: %d\n", doCount)
+}
+
+------
+output:
+
+index:100, v: result_100, err: <nil>
+index:100, ret:result_100, shared:true, err:<nil>
+index:0, ret:result_100, shared:true, err:<nil>
+index:4, ret:result_100, shared:true, err:<nil>
+index:2, ret:result_100, shared:true, err:<nil>
+index:3, ret:result_100, shared:true, err:<nil>
+index:1, ret:result_100, shared:true, err:<nil>
+实际执行次数: 1
+真正发起共享的函数Do入参是有key的，我们把key做个替换，会发现不同key之间不共享，如下：'><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://duck-dd.github.io/posts/"},{"@type":"ListItem","position":2,"name":"golang singleflight","item":"https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"golang singleflight","name":"golang singleflight","description":"高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。\n通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：golang.org/x/sync/singleflight。\n如下面的例子，doSth有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起doSth的index是可控的，然后我们看到输出实际doSth只执行了一次，所有routine共享了同一份结果。 PS：所有的shared返回值都是true，可能并不是大脑第一印象的第一个实际执行者是false，其他人是true\npackage main import ( \u0026#34;fmt\u0026#34; \u0026#34;sync\u0026#34; \u0026#34;sync/atomic\u0026#34; \u0026#34;time\u0026#34; \u0026#34;golang.org/x/sync/singleflight\u0026#34; ) func doSth(index int) (any, error) { time.Sleep(2 * time.Second) return fmt.Sprintf(\u0026#34;result_%d\u0026#34;, index), nil } func main() { var g singleflight.Group var wg sync.WaitGroup var doCount int32 for i := 100; i \u0026lt; 101; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\u0026#34;key\u0026#34;, func() (interface{}, error) { atomic.AddInt32(\u0026amp;doCount, 1) v,e := doSth(index) fmt.Printf(\u0026#34;index:%d, v: %v, err: %v\\n\u0026#34;, index, v, e) return v,e }) fmt.Printf(\u0026#34;index:%d, ret:%v, shared:%v, err:%v\\n\u0026#34;, index, ret, shared, err) }() } time.Sleep(time.Second) for i := 0; i \u0026lt; 5; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\u0026#34;key\u0026#34;, func() (interface{}, error) { atomic.AddInt32(\u0026amp;doCount, 1) v,e := doSth(index) fmt.Printf(\u0026#34;index:%d, v: %v, err: %v\\n\u0026#34;, index, v, e) return v,e }) fmt.Printf(\u0026#34;index:%d, ret:%v, shared:%v, err:%v\\n\u0026#34;, index, ret, shared, err) }() } wg.Wait() fmt.Printf(\u0026#34;实际执行次数: %d\\n\u0026#34;, doCount) } ------ output: index:100, v: result_100, err: \u0026lt;nil\u0026gt; index:100, ret:result_100, shared:true, err:\u0026lt;nil\u0026gt; index:0, ret:result_100, shared:true, err:\u0026lt;nil\u0026gt; index:4, ret:result_100, shared:true, err:\u0026lt;nil\u0026gt; index:2, ret:result_100, shared:true, err:\u0026lt;nil\u0026gt; index:3, ret:result_100, shared:true, err:\u0026lt;nil\u0026gt; index:1, ret:result_100, shared:true, err:\u0026lt;nil\u0026gt; 实际执行次数: 1 真正发起共享的函数Do入参是有key的，我们把key做个替换，会发现不同key之间不共享，如下：\n","keywords":["Golang","2025"],"articleBody":"高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。\n通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：golang.org/x/sync/singleflight。\n如下面的例子，doSth有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起doSth的index是可控的，然后我们看到输出实际doSth只执行了一次，所有routine共享了同一份结果。 PS：所有的shared返回值都是true，可能并不是大脑第一印象的第一个实际执行者是false，其他人是true\npackage main import ( \"fmt\" \"sync\" \"sync/atomic\" \"time\" \"golang.org/x/sync/singleflight\" ) func doSth(index int) (any, error) { time.Sleep(2 * time.Second) return fmt.Sprintf(\"result_%d\", index), nil } func main() { var g singleflight.Group var wg sync.WaitGroup var doCount int32 for i := 100; i \u003c 101; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\"key\", func() (interface{}, error) { atomic.AddInt32(\u0026doCount, 1) v,e := doSth(index) fmt.Printf(\"index:%d, v: %v, err: %v\\n\", index, v, e) return v,e }) fmt.Printf(\"index:%d, ret:%v, shared:%v, err:%v\\n\", index, ret, shared, err) }() } time.Sleep(time.Second) for i := 0; i \u003c 5; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\"key\", func() (interface{}, error) { atomic.AddInt32(\u0026doCount, 1) v,e := doSth(index) fmt.Printf(\"index:%d, v: %v, err: %v\\n\", index, v, e) return v,e }) fmt.Printf(\"index:%d, ret:%v, shared:%v, err:%v\\n\", index, ret, shared, err) }() } wg.Wait() fmt.Printf(\"实际执行次数: %d\\n\", doCount) } ------ output: index:100, v: result_100, err: index:100, ret:result_100, shared:true, err: index:0, ret:result_100, shared:true, err: index:4, ret:result_100, shared:true, err: index:2, ret:result_100, shared:true, err: index:3, ret:result_100, shared:true, err: index:1, ret:result_100, shared:true, err: 实际执行次数: 1 真正发起共享的函数Do入参是有key的，我们把key做个替换，会发现不同key之间不共享，如下：\npackage main import ( \"fmt\" \"sync\" \"sync/atomic\" \"time\" \"golang.org/x/sync/singleflight\" ) func doSth(index int) (any, error) { time.Sleep(2 * time.Second) return fmt.Sprintf(\"result_%d\", index), nil } func main() { var g singleflight.Group var wg sync.WaitGroup var doCount int32 for i := 100; i \u003c 101; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\"key\", func() (interface{}, error) { atomic.AddInt32(\u0026doCount, 1) v,e := doSth(index) fmt.Printf(\"index:%d, v: %v, err: %v\\n\", index, v, e) return v,e }) fmt.Printf(\"index:%d, ret:%v, shared:%v, err:%v\\n\", index, ret, shared, err) }() } time.Sleep(time.Second) for i := 0; i \u003c 5; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\"key-another\", func() (interface{}, error) { atomic.AddInt32(\u0026doCount, 1) v,e := doSth(index) fmt.Printf(\"index:%d, v: %v, err: %v\\n\", index, v, e) return v,e }) fmt.Printf(\"index:%d, ret:%v, shared:%v, err:%v\\n\", index, ret, shared, err) }() } wg.Wait() fmt.Printf(\"实际执行次数: %d\\n\", doCount) } ------ output: index:100, v: result_100, err: index:100, ret:result_100, shared:false, err: index:4, v: result_4, err: index:4, ret:result_4, shared:true, err: index:0, ret:result_4, shared:true, err: index:1, ret:result_4, shared:true, err: index:2, ret:result_4, shared:true, err: index:3, ret:result_4, shared:true, err: 实际执行次数: 2 基于缓存的思想，那么就会问了，这个被“缓存”的结果生命周期是多久呢？我们能不能设置每个key的缓存时间呢？答案是否定的，缓存时间不支持设置，他的生命周期是发起实际执行动作的函数没有执行完成期间所有加入这个key的调用会等待这份共享结果，如下例，第一轮for循环Do2s执行完成，即使routine还在，但是sleep 3s后下一轮for+routine执行时已经不再共享这份数据。\npackage main import ( \"fmt\" \"sync\" \"sync/atomic\" \"time\" \"golang.org/x/sync/singleflight\" ) func doSth(index int) (any, error) { time.Sleep(2 * time.Second) return fmt.Sprintf(\"result_%d\", index), nil } func main() { var g singleflight.Group var wg sync.WaitGroup var doCount int32 for i := 100; i \u003c 101; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\"key\", func() (interface{}, error) { atomic.AddInt32(\u0026doCount, 1) v,e := doSth(index) fmt.Printf(\"index:%d, v: %v, err: %v\\n\", index, v, e) return v,e }) time.Sleep(10 * time.Second) fmt.Printf(\"index:%d, ret:%v, shared:%v, err:%v\\n\", index, ret, shared, err) }() } time.Sleep(3 * time.Second) for i := 0; i \u003c 5; i++ { wg.Add(1) index := i go func() { defer wg.Done() ret, err, shared := g.Do(\"key\", func() (interface{}, error) { atomic.AddInt32(\u0026doCount, 1) v,e := doSth(index) fmt.Printf(\"index:%d, v: %v, err: %v\\n\", index, v, e) return v,e }) fmt.Printf(\"index:%d, ret:%v, shared:%v, err:%v\\n\", index, ret, shared, err) }() } wg.Wait() fmt.Printf(\"实际执行次数: %d\\n\", doCount) } ------ output: index:100, v: result_100, err: index:4, v: result_4, err: index:4, ret:result_4, shared:true, err: index:1, ret:result_4, shared:true, err: index:0, ret:result_4, shared:true, err: index:3, ret:result_4, shared:true, err: index:2, ret:result_4, shared:true, err: index:100, ret:result_100, shared:false, err: 实际执行次数: 2 ","wordCount":"565","inLanguage":"en","image":"https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E","datePublished":"2025-04-05T00:00:00Z","dateModified":"2025-04-05T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/"},"publisher":{"@type":"Organization","name":"Duck","logo":{"@type":"ImageObject","url":"https://duck-dd.github.io/%3Clink%20/%20abs%20url%3E"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://duck-dd.github.io/ accesskey=h title="首页 (Alt + H)"><img src=https://duck-dd.github.io/apple-touch-icon.png alt aria-label=logo height=35>首页</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://duck-dd.github.io/categories/ title=分类><span>分类</span></a></li><li><a href=https://duck-dd.github.io/tags/ title=标签><span>标签</span></a></li><li><a href=https://duck-dd.github.io/about_me title=关于我><span>关于我</span></a></li><li><a href=https://duck-dd.github.io/about_space title=关于这里><span>关于这里</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://duck-dd.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://duck-dd.github.io/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">golang singleflight</h1><div class=post-meta><span title='2025-04-05 00:00:00 +0000 UTC'>2025-04-05</span>&nbsp;·&nbsp;创建于:&nbsp;2025-04-05&nbsp;·&nbsp;3 min&nbsp;·&nbsp;565 words<div class=meta-item>&nbsp·&nbsp
+<a href=https://duck-dd.github.io/categories/cs/>CS</a></div><div class=meta-item>&nbsp·&nbsp
+<a href=https://duck-dd.github.io/tags/golang/>Golang</a>
+<span>,</span>
+<a href=https://duck-dd.github.io/tags/2025/>2025</a></div></div></header><div class=post-content><p>高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。</p><p>通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：<code>golang.org/x/sync/singleflight</code>。</p><p>如下面的例子，<code>doSth</code>有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起<code>doSth</code>的<code>index</code>是可控的，然后我们看到输出实际<code>doSth</code>只执行了一次，所有routine共享了同一份结果。
+PS：所有的<code>shared</code>返回值都是<code>true</code>，可能并不是大脑第一印象的第一个实际执行者是<code>false</code>，其他人是<code>true</code></p><pre tabindex=0><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;sync&#34;
+	&#34;sync/atomic&#34;
+	&#34;time&#34;
+	&#34;golang.org/x/sync/singleflight&#34;
+)
+
+func doSth(index int) (any, error) {
+	time.Sleep(2 * time.Second)
+	return fmt.Sprintf(&#34;result_%d&#34;, index), nil
+}
+
+func main() {
+	var g singleflight.Group
+	var wg sync.WaitGroup
+	var doCount int32 
+
+	for i := 100; i &lt; 101; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do(&#34;key&#34;, func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf(&#34;index:%d, v: %v, err: %v\n&#34;, index, v, e)
+				return v,e
+			})
+			fmt.Printf(&#34;index:%d, ret:%v, shared:%v, err:%v\n&#34;, index, ret, shared, err)
+		}()
+	}
+	
+	
+	time.Sleep(time.Second)
+	
+	for i := 0; i &lt; 5; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do(&#34;key&#34;, func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf(&#34;index:%d, v: %v, err: %v\n&#34;, index, v, e)
+				return v,e
+			})
+			fmt.Printf(&#34;index:%d, ret:%v, shared:%v, err:%v\n&#34;, index, ret, shared, err)
+		}()
+	}
+	
+	wg.Wait()
+	
+	fmt.Printf(&#34;实际执行次数: %d\n&#34;, doCount)
+}
+
+------
+output:
+
+index:100, v: result_100, err: &lt;nil&gt;
+index:100, ret:result_100, shared:true, err:&lt;nil&gt;
+index:0, ret:result_100, shared:true, err:&lt;nil&gt;
+index:4, ret:result_100, shared:true, err:&lt;nil&gt;
+index:2, ret:result_100, shared:true, err:&lt;nil&gt;
+index:3, ret:result_100, shared:true, err:&lt;nil&gt;
+index:1, ret:result_100, shared:true, err:&lt;nil&gt;
+实际执行次数: 1
+</code></pre><p>真正发起共享的函数<code>Do</code>入参是有<code>key</code>的，我们把<code>key</code>做个替换，会发现不同<code>key</code>之间不共享，如下：</p><pre tabindex=0><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;sync&#34;
+	&#34;sync/atomic&#34;
+	&#34;time&#34;
+	&#34;golang.org/x/sync/singleflight&#34;
+)
+
+func doSth(index int) (any, error) {
+	time.Sleep(2 * time.Second)
+	return fmt.Sprintf(&#34;result_%d&#34;, index), nil
+}
+
+func main() {
+	var g singleflight.Group
+	var wg sync.WaitGroup
+	var doCount int32 
+
+	for i := 100; i &lt; 101; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do(&#34;key&#34;, func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf(&#34;index:%d, v: %v, err: %v\n&#34;, index, v, e)
+				return v,e
+			})
+			fmt.Printf(&#34;index:%d, ret:%v, shared:%v, err:%v\n&#34;, index, ret, shared, err)
+		}()
+	}
+	
+	
+	time.Sleep(time.Second)
+	
+	for i := 0; i &lt; 5; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do(&#34;key-another&#34;, func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf(&#34;index:%d, v: %v, err: %v\n&#34;, index, v, e)
+				return v,e
+			})
+			fmt.Printf(&#34;index:%d, ret:%v, shared:%v, err:%v\n&#34;, index, ret, shared, err)
+		}()
+	}
+	
+	wg.Wait()
+	
+	fmt.Printf(&#34;实际执行次数: %d\n&#34;, doCount)
+}
+
+------
+output:
+
+index:100, v: result_100, err: &lt;nil&gt;
+index:100, ret:result_100, shared:false, err:&lt;nil&gt;
+index:4, v: result_4, err: &lt;nil&gt;
+index:4, ret:result_4, shared:true, err:&lt;nil&gt;
+index:0, ret:result_4, shared:true, err:&lt;nil&gt;
+index:1, ret:result_4, shared:true, err:&lt;nil&gt;
+index:2, ret:result_4, shared:true, err:&lt;nil&gt;
+index:3, ret:result_4, shared:true, err:&lt;nil&gt;
+实际执行次数: 2
+</code></pre><p>基于缓存的思想，那么就会问了，这个被“缓存”的结果生命周期是多久呢？我们能不能设置每个<code>key</code>的缓存时间呢？答案是否定的，缓存时间不支持设置，他的生命周期是<code>发起实际执行动作的函数没有执行完成期间</code>所有加入这个<code>key</code>的调用会等待这份共享结果，如下例，第一轮for循环<code>Do</code>2s执行完成，即使routine还在，但是sleep 3s后下一轮for+routine执行时已经不再共享这份数据。</p><pre tabindex=0><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;sync&#34;
+	&#34;sync/atomic&#34;
+	&#34;time&#34;
+	&#34;golang.org/x/sync/singleflight&#34;
+)
+
+func doSth(index int) (any, error) {
+	time.Sleep(2 * time.Second)
+	return fmt.Sprintf(&#34;result_%d&#34;, index), nil
+}
+
+func main() {
+	var g singleflight.Group
+	var wg sync.WaitGroup
+	var doCount int32 
+
+	for i := 100; i &lt; 101; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do(&#34;key&#34;, func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf(&#34;index:%d, v: %v, err: %v\n&#34;, index, v, e)
+				return v,e
+			})
+			time.Sleep(10 * time.Second)
+			fmt.Printf(&#34;index:%d, ret:%v, shared:%v, err:%v\n&#34;, index, ret, shared, err)
+		}()
+	}
+	
+	time.Sleep(3 * time.Second)
+	
+	for i := 0; i &lt; 5; i++ {
+		wg.Add(1)
+		index := i
+		go func() {
+			defer wg.Done()
+			ret, err, shared := g.Do(&#34;key&#34;, func() (interface{}, error) {
+				atomic.AddInt32(&amp;doCount, 1)
+				v,e := doSth(index)
+				fmt.Printf(&#34;index:%d, v: %v, err: %v\n&#34;, index, v, e)
+				return v,e
+			})
+			fmt.Printf(&#34;index:%d, ret:%v, shared:%v, err:%v\n&#34;, index, ret, shared, err)
+		}()
+	}
+	
+	wg.Wait()
+	
+	fmt.Printf(&#34;实际执行次数: %d\n&#34;, doCount)
+}
+
+------
+output:
+
+index:100, v: result_100, err: &lt;nil&gt;
+index:4, v: result_4, err: &lt;nil&gt;
+index:4, ret:result_4, shared:true, err:&lt;nil&gt;
+index:1, ret:result_4, shared:true, err:&lt;nil&gt;
+index:0, ret:result_4, shared:true, err:&lt;nil&gt;
+index:3, ret:result_4, shared:true, err:&lt;nil&gt;
+index:2, ret:result_4, shared:true, err:&lt;nil&gt;
+index:100, ret:result_100, shared:false, err:&lt;nil&gt;
+实际执行次数: 2
+</code></pre></div><footer class=post-footer><ul class=post-tags><li><a href=https://duck-dd.github.io/tags/golang/>Golang</a></li><li><a href=https://duck-dd.github.io/tags/2025/>2025</a></li></ul><nav class=paginav><a class=prev href=https://duck-dd.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/><span class=title>« Prev</span><br><span>认清自己</span>
+</a><a class=next href=https://duck-dd.github.io/posts/2023-06-24-%E8%A3%85%E4%BF%AE/><span class=title>Next »</span><br><span>装修那些事儿</span></a></nav></footer><script src=https://utteranc.es/client.js repo=duck-dd/blog-comment issue-term=pathname label='💬 Comments' theme=github-light crossorigin=anonymous async></script></article></main><footer class=footer><span>&copy; 2025 <a href=https://duck-dd.github.io/>Duck</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$",right:"$",display:!1},{left:"$$",right:"$$",display:!0}],throwOnError:!1})})</script></body></html>
