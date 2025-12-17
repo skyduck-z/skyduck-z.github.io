@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Categories on Duck</title>
-    <link>https://duck-dd.github.io/categories/</link>
-    <description>Recent content in Categories on Duck</description>
+    <title>Categories on skyduck</title>
+    <link>https://skyduck-z.github.io/categories/</link>
+    <description>Recent content in Categories on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Sun, 16 Nov 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Read</title>
-      <link>https://duck-dd.github.io/categories/read/</link>
+      <link>https://skyduck-z.github.io/categories/read/</link>
       <pubDate>Sun, 16 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/categories/read/</guid>
+      <guid>https://skyduck-z.github.io/categories/read/</guid>
       <description></description>
     </item>
     <item>
       <title>Anything</title>
-      <link>https://duck-dd.github.io/categories/anything/</link>
+      <link>https://skyduck-z.github.io/categories/anything/</link>
       <pubDate>Sat, 08 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/categories/anything/</guid>
+      <guid>https://skyduck-z.github.io/categories/anything/</guid>
       <description></description>
     </item>
     <item>
       <title>About</title>
-      <link>https://duck-dd.github.io/categories/about/</link>
+      <link>https://skyduck-z.github.io/categories/about/</link>
       <pubDate>Fri, 08 Aug 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/categories/about/</guid>
+      <guid>https://skyduck-z.github.io/categories/about/</guid>
       <description></description>
     </item>
     <item>
       <title>CS</title>
-      <link>https://duck-dd.github.io/categories/cs/</link>
+      <link>https://skyduck-z.github.io/categories/cs/</link>
       <pubDate>Tue, 24 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/categories/cs/</guid>
+      <guid>https://skyduck-z.github.io/categories/cs/</guid>
       <description></description>
     </item>
     <item>
       <title>Diary</title>
-      <link>https://duck-dd.github.io/categories/diary/</link>
+      <link>https://skyduck-z.github.io/categories/diary/</link>
       <pubDate>Wed, 28 May 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/categories/diary/</guid>
+      <guid>https://skyduck-z.github.io/categories/diary/</guid>
       <description></description>
     </item>
     <item>
       <title>Life-Note</title>
-      <link>https://duck-dd.github.io/categories/life-note/</link>
+      <link>https://skyduck-z.github.io/categories/life-note/</link>
       <pubDate>Sat, 24 Jun 2023 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/categories/life-note/</guid>
+      <guid>https://skyduck-z.github.io/categories/life-note/</guid>
       <description></description>
     </item>
   </channel>

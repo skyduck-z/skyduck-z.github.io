@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Algorithm on Duck</title>
-    <link>https://duck-dd.github.io/tags/algorithm/</link>
-    <description>Recent content in Algorithm on Duck</description>
+    <title>Algorithm on skyduck</title>
+    <link>https://skyduck-z.github.io/tags/algorithm/</link>
+    <description>Recent content in Algorithm on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Tue, 24 Jun 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/tags/algorithm/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/tags/algorithm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>MCMF from scratch</title>
-      <link>https://duck-dd.github.io/posts/2025-06-24-mcmf/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-24-mcmf/</link>
       <pubDate>Tue, 24 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-24-mcmf/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-24-mcmf/</guid>
       <description>&lt;p&gt;需要深度用到MCMF了，但是摸了摸自己的脑门，脑子里没有公式和演算，只剩几个概念了。
 记录一下我从使用的角度理解MCMF问题(东拼西凑)的过程；某些定理的推导，或者复杂度的计算原理，不会深扒；顺便说个感悟，在feed如此丰富的今天，我们还是应该时刻锻炼传统手艺，保留信息检索、过滤、沉淀的能力，否则可能会越走越远(挺简单个问题一开始看偏了太难理解了)。&lt;/p&gt;
 &lt;h1 id=&#34;mcmf概念&#34;&gt;MCMF概念&lt;/h1&gt;
@@ -32,7 +32,7 @@
 那么朴素的第一印象来看，暴力呗，BFS把所有&lt;code&gt;s-&amp;gt;t&lt;/code&gt;路径集合&lt;code&gt;P&lt;/code&gt;全部记录下来，然后逐条路径遍历&lt;code&gt;P&lt;/code&gt;，每一条路径都跑满(路径上最小容量边)，同时更新涉及的边的容量值(这里可能还需要维护一个&lt;code&gt;边-&amp;gt;剩余容量&lt;/code&gt;)，结束后得到一个总的流量值。
 提出这个方案后，我们第一时间就会有做简单优化的想法，最朴素的想法就是，对于&lt;code&gt;s&lt;/code&gt;的所有出边都满，或者&lt;code&gt;t&lt;/code&gt;的所有入边都满的情况下，是可以快速退出的；有了快速退出这个想法后，继续思考，&lt;code&gt;P&lt;/code&gt;的遍历顺序是对退出速度有影响的，初始状态下所有边没有消耗，&lt;code&gt;P&lt;/code&gt;中的所有路径按大小排序，从大到小的顺序排序，大点干早点散(每次选择一条路径并记录开销后，也可以对&lt;code&gt;P&lt;/code&gt;剩余的路径重排序，只不过开销比较大)，这样感觉上可以更快结束。
 好了，聪明的你，在10s以内经历了上述的思考过程，但你眉头一皱，发现问题并不如此简单，简单的想法并不能确保能找到最大流，例如如下的情况：&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;图1 blocking-flow(黑色数字=容量,红色数字=流量)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/mcmf/mcmf-1.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;图1 blocking-flow(黑色数字=容量,红色数字=流量)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/mcmf/mcmf-1.png&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 blocking-flow(黑色数字=容量,红色数字=流量)&lt;/center&gt;
 &lt;p&gt;如图1左(黑色数字=容量,红色数字=流量)，流量=4后，无法再找到路径可通过流量了，但是如图1右，最大流其实是5；这里引入一个概念，&lt;code&gt;阻塞流&lt;/code&gt;，即将所有的路径都阻塞了，无法再新增流量；显而易见，最大流是阻塞流，但阻塞流未必是最大流。
 结合这个具体的例子，我们反过来思考为什么我们上面一起想出来的朴素的方法无法确保能够找到最大流呢？我们就结合这一个具体的简单的例子来分析，把整个图1左的中间部分完全忽略，我们只关注起点&lt;code&gt;s&lt;/code&gt;以及他的出边，终点&lt;code&gt;t&lt;/code&gt;以及他的入边，我们碰到了这样一个情况，我们选定了&lt;code&gt;s&lt;/code&gt;的左出边以及&lt;code&gt;t&lt;/code&gt;的右入边并且把它们两个给跑满了，而&lt;code&gt;s&lt;/code&gt;的右出边和&lt;code&gt;t&lt;/code&gt;的左入边他们两个虽然还有容量但是却无法互连(即我们忽略的图的中间的部分没办法把它们连接起来)，而图1右中，&lt;code&gt;t&lt;/code&gt;的右入边跑满的流量不仅仅来自于&lt;code&gt;s&lt;/code&gt;的左出边，还有&lt;code&gt;s&lt;/code&gt;的右出边；ok, you got it! 简单总结，我们的朴素的暴力解法存在的问题是，会存在不合理的路径规划，他会把若干个瓶颈边放到一条路径里，导致多个瓶颈被同时耗尽。当然了，这是我们最通俗的理解，未必描述的是准确的。&lt;/p&gt;
@@ -51,16 +51,16 @@
 从物理意义上，反向边一开始是没有的，对正向边开销后才会有反向边(容量等于正向边的开销值)，这没有问题；反向边产生开销时，实际效果类似于水流对冲，本来正向走3个水流，反向再走一个水流，其实最终的效果就等于这条水管(边)正向走了2个水流，解释的通，看来可以理解。
 但是回到上面我们自己的思考，我们(或者可能只是我)愚蠢的脑袋里想的是要对之前的路径做撤销，当我们在某一轮迭代中使用到了一条反向边时，我们相当于对曾经使用到这条边的某一条路径撤销了一个流量，是这样吗？(如果是这样那就不应该仅是这一条反向边要做开销了，而是应该找到一条路径)
 不是的，还是用图1左举例，他的&lt;code&gt;residual graph&lt;/code&gt;如下：&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;图2 图1左的residual graph&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/mcmf/mcmf-2.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;图2 图1左的residual graph&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/mcmf/mcmf-2.png&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 图1左部的residual-graph&lt;/center&gt;
 &lt;p&gt;图2中，我们可以继续找到这样一条路径&lt;code&gt;s-&amp;gt;v2-&amp;gt;v4-&amp;gt;v1-&amp;gt;v3-&amp;gt;t 流量=1&lt;/code&gt;，其中&lt;code&gt;v4-&amp;gt;v1 流量=1&lt;/code&gt;这一段是我们选中的反向边(我们只对这一条边做了&amp;quot;撤销&amp;quot;)，可以看到，经过这一次修正后，我们实际的路径选择就跟图1右的最大流一致了，眼前的事实证明&lt;code&gt;Ford-Fulkerson&lt;/code&gt;算法是正确的。
 那我们尝试解答一下我们刚才产生的那个疑惑，当我们使用了一条反向边的时候，我们究竟在做什么?我是这样理解这个问题的，在&lt;code&gt;residual graph&lt;/code&gt;中，如果我们在一条路径中使用到了一条反向边，那么说明一个问题，在最初的原图中，分别存在&lt;code&gt;s&lt;/code&gt;&amp;mdash;&amp;gt;&lt;code&gt;t&lt;/code&gt;的这样两条路径，分别包含了这条边的两个端点，我们可以把这个图抽象成一个&lt;code&gt;H&lt;/code&gt;型，这条边就是中间的横杠，当我们开销这条边的反向边时，实际是在调整&lt;code&gt;H&lt;/code&gt;型的两条竖线之间的流量分配方式(即合理规划使用&lt;code&gt;H&lt;/code&gt;的左上 左下 右上 右下四部分)，以使得整个&lt;code&gt;H&lt;/code&gt;通过的流量最大。&lt;/p&gt;</description>
     </item>
     <item>
       <title>The Shortest Path</title>
-      <link>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-23-shortest-path/</link>
       <pubDate>Mon, 23 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-23-shortest-path/</guid>
       <description>&lt;h1 id=&#34;最短路径问题&#34;&gt;最短路径问题&lt;/h1&gt;
 &lt;p&gt;寻找有向图中两个顶点之间的路径，使得 &lt;code&gt;路径最短&lt;/code&gt; 或 &lt;code&gt;路径上各边的权重之和最小&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;1-无权图最短路径&#34;&gt;1 无权图最短路径&lt;/h2&gt;

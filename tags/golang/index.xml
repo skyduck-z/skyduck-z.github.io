@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Golang on Duck</title>
-    <link>https://duck-dd.github.io/tags/golang/</link>
-    <description>Recent content in Golang on Duck</description>
+    <title>Golang on skyduck</title>
+    <link>https://skyduck-z.github.io/tags/golang/</link>
+    <description>Recent content in Golang on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Sat, 05 Apr 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>go tips(持续更新)</title>
-      <link>https://duck-dd.github.io/posts/2025-06-22-go-tips/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-22-go-tips/</link>
       <pubDate>Sun, 22 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-22-go-tips/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-22-go-tips/</guid>
       <description>&lt;p&gt;有很多从其他大佬的总结中抄来的，不注明出处了&lt;/p&gt;
 &lt;p&gt;会记录一些:&lt;/p&gt;
 &lt;ul&gt;
@@ -81,9 +81,9 @@ func main() {
     </item>
     <item>
       <title>golang singleflight</title>
-      <link>https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/</link>
+      <link>https://skyduck-z.github.io/posts/2025-04-05-golang-singleflight/</link>
       <pubDate>Sat, 05 Apr 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-04-05-golang-singleflight/</guid>
       <description>&lt;p&gt;高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。&lt;/p&gt;
 &lt;p&gt;通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：&lt;code&gt;golang.org/x/sync/singleflight&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;如下面的例子，&lt;code&gt;doSth&lt;/code&gt;有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起&lt;code&gt;doSth&lt;/code&gt;的&lt;code&gt;index&lt;/code&gt;是可控的，然后我们看到输出实际&lt;code&gt;doSth&lt;/code&gt;只执行了一次，所有routine共享了同一份结果。
@@ -161,9 +161,9 @@ index:1, ret:result_100, shared:true, err:&amp;lt;nil&amp;gt;
     </item>
     <item>
       <title>golang select case机会均等</title>
-      <link>https://duck-dd.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</link>
+      <link>https://skyduck-z.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</link>
       <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</guid>
+      <guid>https://skyduck-z.github.io/posts/2022-04-13-golang-select-case%E6%9C%BA%E4%BC%9A%E5%9D%87%E7%AD%89/</guid>
       <description>&lt;h1 id=&#34;验证&#34;&gt;验证&lt;/h1&gt;
 &lt;p&gt;我们每天都在使用下面这样的用法，对于这种多条件分支判定，我们从来不会指定权重，按固有思维，多条件间应该是机会均等的，那么golang如何做的呢？&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;select {
@@ -219,9 +219,9 @@ sum:  23369 25833 30798
     </item>
     <item>
       <title>Golang schedule</title>
-      <link>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</link>
+      <link>https://skyduck-z.github.io/posts/2021-08-21-go-schedule/</link>
       <pubDate>Sat, 21 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-08-21-go-schedule/</guid>
       <description>&lt;h2 id=&#34;写在前面&#34;&gt;写在前面&lt;/h2&gt;
 &lt;p&gt;runtime包实现了所有&lt;code&gt;goroutine scheduler&lt;/code&gt;、&lt;code&gt;memory allocator&lt;/code&gt;、&lt;code&gt;garbage collector&lt;/code&gt;细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。&lt;/p&gt;
 &lt;p&gt;搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM-&amp;gt;GMP演化后的材料。&lt;/p&gt;
@@ -240,7 +240,7 @@ sum:  23369 25833 30798
 &lt;li&gt;对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;p&gt;&lt;img alt=&#34;GM-model&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/go-schedule/gm.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;GM-model&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/go-schedule/gm.png&#34;&gt;&lt;/p&gt;
 &lt;p&gt;那么GM模型有哪些问题呢？&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;(&lt;strong&gt;重点问题&lt;/strong&gt;)单一的全局mutex(sched.lock)和集中状态管理

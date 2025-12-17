@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Diary on Duck</title>
-    <link>https://duck-dd.github.io/categories/diary/</link>
-    <description>Recent content in Diary on Duck</description>
+    <title>Diary on skyduck</title>
+    <link>https://skyduck-z.github.io/categories/diary/</link>
+    <description>Recent content in Diary on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Wed, 28 May 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/categories/diary/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/categories/diary/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>认清自己</title>
-      <link>https://duck-dd.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</link>
+      <link>https://skyduck-z.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</link>
       <pubDate>Wed, 28 May 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</guid>
       <description>&lt;hr&gt;
 &lt;p&gt;&lt;strong&gt;渭城朝雨浥轻尘&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;客舍青青柳色新&lt;/strong&gt;&lt;/p&gt;
@@ -46,9 +46,9 @@
     </item>
     <item>
       <title>离职人生体验</title>
-      <link>https://duck-dd.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</link>
+      <link>https://skyduck-z.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</link>
       <pubDate>Thu, 08 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</guid>
       <description>&lt;p&gt;2018年7月4日，星期三，天气晴。&lt;/p&gt;
 &lt;p&gt;早晨7点半，太阳已经很大，收拾好材料，出发，今天是上班的第一天，也是第一天上班。浑浑噩噩的流程，脑子里什么都没进，然后晕头转向的上了班车，从大厦到了科技园。找工位，认识同事，熟悉环境，然后第一天就心大的开始午睡，睡了2小时，爬起来，心想，坏了，睡过了，然后，发现并没有人关注我，呼～，长出一口气，心想社畜生活貌似还挺轻松。&lt;/p&gt;
 &lt;p&gt;leader下午快到晚饭才开完会（以至于后面很长一段时间我觉得自己菜的评判标准就是没会开，太年轻啊），找到我，“走，一块吃个晚饭”，我怀着无比的尴尬，回，“哥，我吃完了。。。（心想完了第一天就摸鱼还被发现了）”，leader说，那走吧，随便找个空会议室聊两句。“别叫哥，我们这里都不这样叫，直接叫我名字就行”，我心想，业界都传的XX有着最好的氛围，看来是真的，跟学校没什么两样哈。leader说，“BFE听过吧”，我理直气壮的回，“没啊”  （冷场大概有两秒钟吧，这里可能原本应该有十分钟左右的技术交谈，然后大概是临时取消了吧） “我是你的导师，但是平时时间不太充裕，你有问题多问问我们组的人吧，其中还有一个是你的师兄”，“好的”。本次谈话就此结束，我开始回去看材料学习，第一天到底学会了啥，完全不记得了，可能甚至大概都没搞懂BFE全称到底是啥吧。&lt;/p&gt;

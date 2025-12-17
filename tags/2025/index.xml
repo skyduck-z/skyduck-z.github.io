@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>2025 on Duck</title>
-    <link>https://duck-dd.github.io/tags/2025/</link>
-    <description>Recent content in 2025 on Duck</description>
+    <title>2025 on skyduck</title>
+    <link>https://skyduck-z.github.io/tags/2025/</link>
+    <description>Recent content in 2025 on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Sun, 16 Nov 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/tags/2025/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/tags/2025/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>不靠运气赚钱? 选择vs决策</title>
-      <link>https://duck-dd.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</link>
+      <link>https://skyduck-z.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</link>
       <pubDate>Sun, 16 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</guid>
       <description>&lt;p&gt;今天看到一篇软文，引起我共鸣的点是：“你什么时候才能不靠运气赚钱？”&lt;/p&gt;
 &lt;p&gt;说，A B两个人每个月都能赚1000块钱，A靠运气，B靠思路，区别是什么呢？区别在于A的未来充满了不确定，而B未来还会有更高的成就，可能就能够赚2000块钱了。&lt;/p&gt;
 &lt;p&gt;那么这时候有老铁就要问了，到底什么叫&lt;strong&gt;靠运气&lt;/strong&gt;？引申出一个比较，&lt;code&gt;选择vs决策&lt;/code&gt;，&lt;code&gt;选择&lt;/code&gt;就是靠运气，&lt;code&gt;决策&lt;/code&gt;则不是；在与&lt;code&gt;决策&lt;/code&gt;语境对比下的&lt;code&gt;选择&lt;/code&gt;，带有一点贬义，就像是&lt;code&gt;实在没招了 随便选一条路吧&lt;/code&gt;。人生的选择题不像是试卷上的选择题，他们之间的差别主要体现在，人生的选择题大部分时候不是yes or no，人生的选择题可能需要很长时间以后才能知道哪一个选项是更优的；这种延时反馈，会极大的催生出侥幸心理，反正当下也没谁能说出个123，那么无论怎么做都没人能立刻否定我，至于很久以后，那会人们早就忘了10年前我们是选的A还是B了。但是恰恰，这些选择才是真正需要下功夫的，为人生的选择下功夫思考，那么你的任何成就才不算&lt;code&gt;靠运气&lt;/code&gt;。&lt;/p&gt;
@@ -25,9 +25,9 @@
     </item>
     <item>
       <title>工作瓶颈</title>
-      <link>https://duck-dd.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</link>
+      <link>https://skyduck-z.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</link>
       <pubDate>Sat, 15 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</guid>
       <description>&lt;p&gt;跟非互联网行业的亲友聊天，他们最终都难免会提出灵魂拷问，&lt;code&gt;你现在P几呀?&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;原来&lt;code&gt;P序列&lt;/code&gt;的传播是如此的广泛。姑且不论当下，大部分人工作后的第一个长远目标应该都是&lt;code&gt;P8&lt;/code&gt;，因为这是在狭窄视野下能够理解的具体职级要求的极限(至少针对于我)，艰难险阻，走到今天，终于，彻底找不到路了&amp;hellip;&amp;hellip;&lt;/p&gt;
 &lt;p&gt;技术水平的提升，本质上是时间投入，表面来看是&lt;code&gt;信息获取 -&amp;gt; 实践 -&amp;gt; 沉淀&lt;/code&gt;的过程；兴趣是最好的老师，但是30多岁的中登已经完全失去可塑性了，那么只能走偏门，搞一搞方法论；今天读到了大佬的一段捕鼠器案例，我简单总结一下：&lt;/p&gt;
@@ -47,13 +47,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>泰国</title>
-      <link>https://duck-dd.github.io/posts/2025-11-08-%E6%B3%B0%E5%9B%BD/</link>
+      <link>https://skyduck-z.github.io/posts/2025-11-08-%E6%B3%B0%E5%9B%BD/</link>
       <pubDate>Sat, 08 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-11-08-%E6%B3%B0%E5%9B%BD/</guid>
-      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
+      <guid>https://skyduck-z.github.io/posts/2025-11-08-%E6%B3%B0%E5%9B%BD/</guid>
+      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 世界地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
-&lt;p&gt;&lt;img alt=&#34;泰国地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/political_map_thailand.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;泰国地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/political_map_thailand.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 泰国地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
@@ -115,13 +115,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>菲律宾</title>
-      <link>https://duck-dd.github.io/posts/2025-11-08-%E8%8F%B2%E5%BE%8B%E5%AE%BE/</link>
+      <link>https://skyduck-z.github.io/posts/2025-11-08-%E8%8F%B2%E5%BE%8B%E5%AE%BE/</link>
       <pubDate>Sat, 08 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-11-08-%E8%8F%B2%E5%BE%8B%E5%AE%BE/</guid>
-      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
+      <guid>https://skyduck-z.github.io/posts/2025-11-08-%E8%8F%B2%E5%BE%8B%E5%AE%BE/</guid>
+      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 世界地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
-&lt;p&gt;&lt;img alt=&#34;菲律宾地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/philippines_map.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;菲律宾地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/philippines_map.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 菲律宾地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
@@ -188,13 +188,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>马来西亚</title>
-      <link>https://duck-dd.github.io/posts/2025-11-01-%E9%A9%AC%E6%9D%A5%E8%A5%BF%E4%BA%9A/</link>
+      <link>https://skyduck-z.github.io/posts/2025-11-01-%E9%A9%AC%E6%9D%A5%E8%A5%BF%E4%BA%9A/</link>
       <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-11-01-%E9%A9%AC%E6%9D%A5%E8%A5%BF%E4%BA%9A/</guid>
-      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
+      <guid>https://skyduck-z.github.io/posts/2025-11-01-%E9%A9%AC%E6%9D%A5%E8%A5%BF%E4%BA%9A/</guid>
+      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 世界地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
-&lt;p&gt;&lt;img alt=&#34;马来西亚地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/map-of-malaysia.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;马来西亚地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/map-of-malaysia.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 马来西亚地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
@@ -267,13 +267,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>新加坡</title>
-      <link>https://duck-dd.github.io/posts/2025-10-31-%E6%96%B0%E5%8A%A0%E5%9D%A1/</link>
+      <link>https://skyduck-z.github.io/posts/2025-10-31-%E6%96%B0%E5%8A%A0%E5%9D%A1/</link>
       <pubDate>Fri, 31 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-10-31-%E6%96%B0%E5%8A%A0%E5%9D%A1/</guid>
-      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
+      <guid>https://skyduck-z.github.io/posts/2025-10-31-%E6%96%B0%E5%8A%A0%E5%9D%A1/</guid>
+      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 世界地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
-&lt;p&gt;&lt;img alt=&#34;新加坡地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/map_of_singapore.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;新加坡地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/map_of_singapore.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 新加坡地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
@@ -340,13 +340,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>日本</title>
-      <link>https://duck-dd.github.io/posts/2025-10-08-%E6%97%A5%E6%9C%AC/</link>
+      <link>https://skyduck-z.github.io/posts/2025-10-08-%E6%97%A5%E6%9C%AC/</link>
       <pubDate>Wed, 08 Oct 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-10-08-%E6%97%A5%E6%9C%AC/</guid>
-      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
+      <guid>https://skyduck-z.github.io/posts/2025-10-08-%E6%97%A5%E6%9C%AC/</guid>
+      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 世界地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
-&lt;p&gt;&lt;img alt=&#34;日本地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/cities_of_japan_map.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;日本地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/cities_of_japan_map.png&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 日本地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
@@ -417,13 +417,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>越南</title>
-      <link>https://duck-dd.github.io/posts/2025-08-19-%E8%B6%8A%E5%8D%97/</link>
+      <link>https://skyduck-z.github.io/posts/2025-08-19-%E8%B6%8A%E5%8D%97/</link>
       <pubDate>Tue, 19 Aug 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-08-19-%E8%B6%8A%E5%8D%97/</guid>
-      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
+      <guid>https://skyduck-z.github.io/posts/2025-08-19-%E8%B6%8A%E5%8D%97/</guid>
+      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 世界地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
-&lt;p&gt;&lt;img alt=&#34;越南地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/map_of_vietnam.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;越南地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/map_of_vietnam.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 越南地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
@@ -500,13 +500,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>印尼</title>
-      <link>https://duck-dd.github.io/posts/2025-08-15-%E5%8D%B0%E5%B0%BC/</link>
+      <link>https://skyduck-z.github.io/posts/2025-08-15-%E5%8D%B0%E5%B0%BC/</link>
       <pubDate>Fri, 15 Aug 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-08-15-%E5%8D%B0%E5%B0%BC/</guid>
-      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
+      <guid>https://skyduck-z.github.io/posts/2025-08-15-%E5%8D%B0%E5%B0%BC/</guid>
+      <description>&lt;p&gt;&lt;img alt=&#34;世界地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/maps_of_the_world.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 世界地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
-&lt;p&gt;&lt;img alt=&#34;印尼地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/%E5%9B%BD%E5%AE%B6/republic_of_indonesia_map.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;印尼地图(from www.worldmap1.com)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/%E5%9B%BD%E5%AE%B6/republic_of_indonesia_map.jpg&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 印尼地图(from www.worldmap1.com)&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
 &lt;center&gt;&lt;/center&gt;
@@ -569,9 +569,9 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>目标管理法</title>
-      <link>https://duck-dd.github.io/posts/2025-08-13-%E7%9B%AE%E6%A0%87%E7%AE%A1%E7%90%86%E6%B3%95/</link>
+      <link>https://skyduck-z.github.io/posts/2025-08-13-%E7%9B%AE%E6%A0%87%E7%AE%A1%E7%90%86%E6%B3%95/</link>
       <pubDate>Wed, 13 Aug 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-08-13-%E7%9B%AE%E6%A0%87%E7%AE%A1%E7%90%86%E6%B3%95/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-08-13-%E7%9B%AE%E6%A0%87%E7%AE%A1%E7%90%86%E6%B3%95/</guid>
       <description>&lt;p&gt;当我们写KPI时，我们在写什么？当我们写OKR时，我们在写什么？&lt;/p&gt;
 &lt;p&gt;这个问题困扰了许久，从个人的角度，我一直把这些东西当成枷锁，今晚突然寻思，我为什么不能认真审视这个东西，既然总是要花精力来处理，那不如把这个工具用起来。
 人都是渴望自由的，或者至少这么说，放纵总是使绝大多数人快乐的；所以前面我们说目标管理是一种枷锁，但是枷锁未必是坏的东西，它也可能是一种推你向上的动力。
@@ -614,9 +614,9 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>MCMF from scratch</title>
-      <link>https://duck-dd.github.io/posts/2025-06-24-mcmf/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-24-mcmf/</link>
       <pubDate>Tue, 24 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-24-mcmf/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-24-mcmf/</guid>
       <description>&lt;p&gt;需要深度用到MCMF了，但是摸了摸自己的脑门，脑子里没有公式和演算，只剩几个概念了。
 记录一下我从使用的角度理解MCMF问题(东拼西凑)的过程；某些定理的推导，或者复杂度的计算原理，不会深扒；顺便说个感悟，在feed如此丰富的今天，我们还是应该时刻锻炼传统手艺，保留信息检索、过滤、沉淀的能力，否则可能会越走越远(挺简单个问题一开始看偏了太难理解了)。&lt;/p&gt;
 &lt;h1 id=&#34;mcmf概念&#34;&gt;MCMF概念&lt;/h1&gt;
@@ -631,7 +631,7 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
 那么朴素的第一印象来看，暴力呗，BFS把所有&lt;code&gt;s-&amp;gt;t&lt;/code&gt;路径集合&lt;code&gt;P&lt;/code&gt;全部记录下来，然后逐条路径遍历&lt;code&gt;P&lt;/code&gt;，每一条路径都跑满(路径上最小容量边)，同时更新涉及的边的容量值(这里可能还需要维护一个&lt;code&gt;边-&amp;gt;剩余容量&lt;/code&gt;)，结束后得到一个总的流量值。
 提出这个方案后，我们第一时间就会有做简单优化的想法，最朴素的想法就是，对于&lt;code&gt;s&lt;/code&gt;的所有出边都满，或者&lt;code&gt;t&lt;/code&gt;的所有入边都满的情况下，是可以快速退出的；有了快速退出这个想法后，继续思考，&lt;code&gt;P&lt;/code&gt;的遍历顺序是对退出速度有影响的，初始状态下所有边没有消耗，&lt;code&gt;P&lt;/code&gt;中的所有路径按大小排序，从大到小的顺序排序，大点干早点散(每次选择一条路径并记录开销后，也可以对&lt;code&gt;P&lt;/code&gt;剩余的路径重排序，只不过开销比较大)，这样感觉上可以更快结束。
 好了，聪明的你，在10s以内经历了上述的思考过程，但你眉头一皱，发现问题并不如此简单，简单的想法并不能确保能找到最大流，例如如下的情况：&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;图1 blocking-flow(黑色数字=容量,红色数字=流量)&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/mcmf/mcmf-1.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;图1 blocking-flow(黑色数字=容量,红色数字=流量)&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/mcmf/mcmf-1.png&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图1 blocking-flow(黑色数字=容量,红色数字=流量)&lt;/center&gt;
 &lt;p&gt;如图1左(黑色数字=容量,红色数字=流量)，流量=4后，无法再找到路径可通过流量了，但是如图1右，最大流其实是5；这里引入一个概念，&lt;code&gt;阻塞流&lt;/code&gt;，即将所有的路径都阻塞了，无法再新增流量；显而易见，最大流是阻塞流，但阻塞流未必是最大流。
 结合这个具体的例子，我们反过来思考为什么我们上面一起想出来的朴素的方法无法确保能够找到最大流呢？我们就结合这一个具体的简单的例子来分析，把整个图1左的中间部分完全忽略，我们只关注起点&lt;code&gt;s&lt;/code&gt;以及他的出边，终点&lt;code&gt;t&lt;/code&gt;以及他的入边，我们碰到了这样一个情况，我们选定了&lt;code&gt;s&lt;/code&gt;的左出边以及&lt;code&gt;t&lt;/code&gt;的右入边并且把它们两个给跑满了，而&lt;code&gt;s&lt;/code&gt;的右出边和&lt;code&gt;t&lt;/code&gt;的左入边他们两个虽然还有容量但是却无法互连(即我们忽略的图的中间的部分没办法把它们连接起来)，而图1右中，&lt;code&gt;t&lt;/code&gt;的右入边跑满的流量不仅仅来自于&lt;code&gt;s&lt;/code&gt;的左出边，还有&lt;code&gt;s&lt;/code&gt;的右出边；ok, you got it! 简单总结，我们的朴素的暴力解法存在的问题是，会存在不合理的路径规划，他会把若干个瓶颈边放到一条路径里，导致多个瓶颈被同时耗尽。当然了，这是我们最通俗的理解，未必描述的是准确的。&lt;/p&gt;
@@ -650,16 +650,16 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
 从物理意义上，反向边一开始是没有的，对正向边开销后才会有反向边(容量等于正向边的开销值)，这没有问题；反向边产生开销时，实际效果类似于水流对冲，本来正向走3个水流，反向再走一个水流，其实最终的效果就等于这条水管(边)正向走了2个水流，解释的通，看来可以理解。
 但是回到上面我们自己的思考，我们(或者可能只是我)愚蠢的脑袋里想的是要对之前的路径做撤销，当我们在某一轮迭代中使用到了一条反向边时，我们相当于对曾经使用到这条边的某一条路径撤销了一个流量，是这样吗？(如果是这样那就不应该仅是这一条反向边要做开销了，而是应该找到一条路径)
 不是的，还是用图1左举例，他的&lt;code&gt;residual graph&lt;/code&gt;如下：&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;图2 图1左的residual graph&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/mcmf/mcmf-2.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;图2 图1左的residual graph&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/mcmf/mcmf-2.png&#34;&gt;&lt;/p&gt;
 &lt;center&gt;图2 图1左部的residual-graph&lt;/center&gt;
 &lt;p&gt;图2中，我们可以继续找到这样一条路径&lt;code&gt;s-&amp;gt;v2-&amp;gt;v4-&amp;gt;v1-&amp;gt;v3-&amp;gt;t 流量=1&lt;/code&gt;，其中&lt;code&gt;v4-&amp;gt;v1 流量=1&lt;/code&gt;这一段是我们选中的反向边(我们只对这一条边做了&amp;quot;撤销&amp;quot;)，可以看到，经过这一次修正后，我们实际的路径选择就跟图1右的最大流一致了，眼前的事实证明&lt;code&gt;Ford-Fulkerson&lt;/code&gt;算法是正确的。
 那我们尝试解答一下我们刚才产生的那个疑惑，当我们使用了一条反向边的时候，我们究竟在做什么?我是这样理解这个问题的，在&lt;code&gt;residual graph&lt;/code&gt;中，如果我们在一条路径中使用到了一条反向边，那么说明一个问题，在最初的原图中，分别存在&lt;code&gt;s&lt;/code&gt;&amp;mdash;&amp;gt;&lt;code&gt;t&lt;/code&gt;的这样两条路径，分别包含了这条边的两个端点，我们可以把这个图抽象成一个&lt;code&gt;H&lt;/code&gt;型，这条边就是中间的横杠，当我们开销这条边的反向边时，实际是在调整&lt;code&gt;H&lt;/code&gt;型的两条竖线之间的流量分配方式(即合理规划使用&lt;code&gt;H&lt;/code&gt;的左上 左下 右上 右下四部分)，以使得整个&lt;code&gt;H&lt;/code&gt;通过的流量最大。&lt;/p&gt;</description>
     </item>
     <item>
       <title>The Shortest Path</title>
-      <link>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-23-shortest-path/</link>
       <pubDate>Mon, 23 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-23-shortest-path/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-23-shortest-path/</guid>
       <description>&lt;h1 id=&#34;最短路径问题&#34;&gt;最短路径问题&lt;/h1&gt;
 &lt;p&gt;寻找有向图中两个顶点之间的路径，使得 &lt;code&gt;路径最短&lt;/code&gt; 或 &lt;code&gt;路径上各边的权重之和最小&lt;/code&gt;&lt;/p&gt;
 &lt;h2 id=&#34;1-无权图最短路径&#34;&gt;1 无权图最短路径&lt;/h2&gt;
@@ -713,9 +713,9 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>go tips(持续更新)</title>
-      <link>https://duck-dd.github.io/posts/2025-06-22-go-tips/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-22-go-tips/</link>
       <pubDate>Sun, 22 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-22-go-tips/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-22-go-tips/</guid>
       <description>&lt;p&gt;有很多从其他大佬的总结中抄来的，不注明出处了&lt;/p&gt;
 &lt;p&gt;会记录一些:&lt;/p&gt;
 &lt;ul&gt;
@@ -779,9 +779,9 @@ func main() {
     </item>
     <item>
       <title>相似度</title>
-      <link>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
       <pubDate>Tue, 03 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
       <description>&lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;用于衡量多个对象（如文本、数值向量、图像、序列等）之间相似程度的数学方法。&lt;/p&gt;
 &lt;p&gt;在计算机领域，通常将 “相似性” 转化为可计算的数值（例如 0~1 表示，1代表完全相似，0代表完全不相似）。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;的应用十分广泛，例如推荐系统（如商品/内容推荐）、数据挖掘（如聚类、分类）、NLP（如文本查重、语义匹配）、图像识别等。&lt;/p&gt;
@@ -933,9 +933,9 @@ or 向量间欧式距离
     </item>
     <item>
       <title>认清自己</title>
-      <link>https://duck-dd.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</link>
+      <link>https://skyduck-z.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</link>
       <pubDate>Wed, 28 May 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-05-28-%E8%AE%A4%E6%B8%85%E8%87%AA%E5%B7%B1/</guid>
       <description>&lt;hr&gt;
 &lt;p&gt;&lt;strong&gt;渭城朝雨浥轻尘&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;客舍青青柳色新&lt;/strong&gt;&lt;/p&gt;
@@ -964,9 +964,9 @@ or 向量间欧式距离
     </item>
     <item>
       <title>golang singleflight</title>
-      <link>https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/</link>
+      <link>https://skyduck-z.github.io/posts/2025-04-05-golang-singleflight/</link>
       <pubDate>Sat, 05 Apr 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-04-05-golang-singleflight/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-04-05-golang-singleflight/</guid>
       <description>&lt;p&gt;高并发场景下，有时我们很多并发goroutine内有逻辑重合，可能拉了数据库同一张表的数据，可能拉了同一个远程图片，这些数据通常是偏静态的，那么没有必要在每个goroutine内部都做这个操作，可能会拉高上游服务的负载，可能会影响本地的执行效率，可能会浪费本地的网卡资源等。&lt;/p&gt;
 &lt;p&gt;通常我们会依赖缓存来解决这个问题，这也确实是行之有效的；但是golang并发场景也给了我们更简便的实现方法：&lt;code&gt;golang.org/x/sync/singleflight&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;如下面的例子，&lt;code&gt;doSth&lt;/code&gt;有2s的Sleep模拟执行过程；我们分了两组for+routine，中间有1s的Sleep，确保第一个发起&lt;code&gt;doSth&lt;/code&gt;的&lt;code&gt;index&lt;/code&gt;是可控的，然后我们看到输出实际&lt;code&gt;doSth&lt;/code&gt;只执行了一次，所有routine共享了同一份结果。

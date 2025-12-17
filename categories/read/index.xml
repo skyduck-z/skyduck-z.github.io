@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Read on Duck</title>
-    <link>https://duck-dd.github.io/categories/read/</link>
-    <description>Recent content in Read on Duck</description>
+    <title>Read on skyduck</title>
+    <link>https://skyduck-z.github.io/categories/read/</link>
+    <description>Recent content in Read on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Sun, 16 Nov 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/categories/read/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/categories/read/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>不靠运气赚钱? 选择vs决策</title>
-      <link>https://duck-dd.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</link>
+      <link>https://skyduck-z.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</link>
       <pubDate>Sun, 16 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-11-16-%E4%B8%8D%E9%9D%A0%E8%BF%90%E6%B0%94%E8%B5%9A%E9%92%B1/</guid>
       <description>&lt;p&gt;今天看到一篇软文，引起我共鸣的点是：“你什么时候才能不靠运气赚钱？”&lt;/p&gt;
 &lt;p&gt;说，A B两个人每个月都能赚1000块钱，A靠运气，B靠思路，区别是什么呢？区别在于A的未来充满了不确定，而B未来还会有更高的成就，可能就能够赚2000块钱了。&lt;/p&gt;
 &lt;p&gt;那么这时候有老铁就要问了，到底什么叫&lt;strong&gt;靠运气&lt;/strong&gt;？引申出一个比较，&lt;code&gt;选择vs决策&lt;/code&gt;，&lt;code&gt;选择&lt;/code&gt;就是靠运气，&lt;code&gt;决策&lt;/code&gt;则不是；在与&lt;code&gt;决策&lt;/code&gt;语境对比下的&lt;code&gt;选择&lt;/code&gt;，带有一点贬义，就像是&lt;code&gt;实在没招了 随便选一条路吧&lt;/code&gt;。人生的选择题不像是试卷上的选择题，他们之间的差别主要体现在，人生的选择题大部分时候不是yes or no，人生的选择题可能需要很长时间以后才能知道哪一个选项是更优的；这种延时反馈，会极大的催生出侥幸心理，反正当下也没谁能说出个123，那么无论怎么做都没人能立刻否定我，至于很久以后，那会人们早就忘了10年前我们是选的A还是B了。但是恰恰，这些选择才是真正需要下功夫的，为人生的选择下功夫思考，那么你的任何成就才不算&lt;code&gt;靠运气&lt;/code&gt;。&lt;/p&gt;
@@ -25,9 +25,9 @@
     </item>
     <item>
       <title>工作瓶颈</title>
-      <link>https://duck-dd.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</link>
+      <link>https://skyduck-z.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</link>
       <pubDate>Sat, 15 Nov 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-11-15-%E5%B7%A5%E4%BD%9C%E7%93%B6%E9%A2%88/</guid>
       <description>&lt;p&gt;跟非互联网行业的亲友聊天，他们最终都难免会提出灵魂拷问，&lt;code&gt;你现在P几呀?&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;原来&lt;code&gt;P序列&lt;/code&gt;的传播是如此的广泛。姑且不论当下，大部分人工作后的第一个长远目标应该都是&lt;code&gt;P8&lt;/code&gt;，因为这是在狭窄视野下能够理解的具体职级要求的极限(至少针对于我)，艰难险阻，走到今天，终于，彻底找不到路了&amp;hellip;&amp;hellip;&lt;/p&gt;
 &lt;p&gt;技术水平的提升，本质上是时间投入，表面来看是&lt;code&gt;信息获取 -&amp;gt; 实践 -&amp;gt; 沉淀&lt;/code&gt;的过程；兴趣是最好的老师，但是30多岁的中登已经完全失去可塑性了，那么只能走偏门，搞一搞方法论；今天读到了大佬的一段捕鼠器案例，我简单总结一下：&lt;/p&gt;

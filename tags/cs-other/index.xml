@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>CS-Other on Duck</title>
-    <link>https://duck-dd.github.io/tags/cs-other/</link>
-    <description>Recent content in CS-Other on Duck</description>
+    <title>CS-Other on skyduck</title>
+    <link>https://skyduck-z.github.io/tags/cs-other/</link>
+    <description>Recent content in CS-Other on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Tue, 03 Jun 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/tags/cs-other/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/tags/cs-other/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>相似度</title>
-      <link>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
       <pubDate>Tue, 03 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-03-%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
       <description>&lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;用于衡量多个对象（如文本、数值向量、图像、序列等）之间相似程度的数学方法。&lt;/p&gt;
 &lt;p&gt;在计算机领域，通常将 “相似性” 转化为可计算的数值（例如 0~1 表示，1代表完全相似，0代表完全不相似）。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;相似度算法&lt;/code&gt;的应用十分广泛，例如推荐系统（如商品/内容推荐）、数据挖掘（如聚类、分类）、NLP（如文本查重、语义匹配）、图像识别等。&lt;/p&gt;
@@ -169,9 +169,9 @@ or 向量间欧式距离
     </item>
     <item>
       <title>软件架构设计原则</title>
-      <link>https://duck-dd.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</link>
+      <link>https://skyduck-z.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</link>
       <pubDate>Sun, 16 Apr 2023 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</guid>
+      <guid>https://skyduck-z.github.io/posts/2023-04-16-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</guid>
       <description>&lt;p&gt;每次接手一些老旧系统，总是很头疼，最近想，会不会别人接手了我的系统以后也是一样的感受，想到可能有人每天都在吐槽(骂)我头皮发麻啊&amp;hellip;&lt;/p&gt;
 &lt;p&gt;知易行难，其实怎么做好一个后端服务大家都是门清的，只是受限于 &lt;code&gt;排期&lt;/code&gt; &lt;code&gt;业务价值&lt;/code&gt; &lt;code&gt;协作&lt;/code&gt; 等太多因素，往往事与愿违。只能说但行好事莫问前程吧，下面再把这些原则列一下，时刻提醒自己吧；以下原则从个人角度分先后，不是说有重要性区别，而是有些原则很高频，或者很容易被忽略，需要时刻牢记。&lt;/p&gt;
 &lt;h1 id=&#34;一-职责逻辑-清晰&#34;&gt;一 职责/逻辑 清晰&lt;/h1&gt;
@@ -209,18 +209,18 @@ or 向量间欧式距离
     </item>
     <item>
       <title>happens-before</title>
-      <link>https://duck-dd.github.io/posts/2021-08-19-happens-before/</link>
+      <link>https://skyduck-z.github.io/posts/2021-08-19-happens-before/</link>
       <pubDate>Thu, 19 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-08-19-happens-before/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-08-19-happens-before/</guid>
       <description>&lt;p&gt;在并发系统中，用于描述事件执行顺序关系；若事件A &amp;ldquo;happens-before&amp;rdquo; 事件B，则A的执行结果对B可见，且A在逻辑上先于B执行(并不要求在物理时间上A必须先于B执行)。&lt;/p&gt;
 &lt;p&gt;所以这其实是一种逻辑关系，在并发系统中，P1 P2 两个过程在逻辑上&amp;quot;同时&amp;quot;在执行，P2过程中的事件B依赖P1过程中的事件A的结果，那么就需要逻辑上的 &amp;ldquo;happens-before&amp;rdquo; 来确保A&amp;amp;B间的依赖关系。&lt;/p&gt;
 &lt;p&gt;常见的并发模型 &lt;strong&gt;共享内存&lt;/strong&gt; 和 &lt;strong&gt;消息传递&lt;/strong&gt;，都遵循 &amp;ldquo;happens-before&amp;quot;逻辑，消息传递中的happens-before好理解，消息的传入肯定是在消息的接收之前的，在共享内存模型的并发中，happens-before就是帮助我们在逻辑上自洽，理清楚不同并发单元(线程 协程 等)对某一个共享内存变量的操作顺序。&lt;/p&gt;</description>
     </item>
     <item>
       <title>DNS</title>
-      <link>https://duck-dd.github.io/posts/2021-05-13-dns/</link>
+      <link>https://skyduck-z.github.io/posts/2021-05-13-dns/</link>
       <pubDate>Thu, 13 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-05-13-dns/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-05-13-dns/</guid>
       <description>&lt;h1 id=&#34;dns&#34;&gt;DNS？&lt;/h1&gt;
 &lt;h2 id=&#34;一些概念&#34;&gt;一些概念&lt;/h2&gt;
 &lt;ul&gt;
@@ -248,7 +248,7 @@ or 向量间欧式距离
 &lt;h3 id=&#34;bind管理方式&#34;&gt;BIND管理方式&lt;/h3&gt;
 &lt;p&gt;BIND是一套阶层式的管理主机名与IP对应关系的系统。&lt;/p&gt;
 &lt;p&gt;阶层式？可以简单理解为树状结构的不同层级，下面来简单分析下阶层式。&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/dns/1.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/dns/1.jpg&#34;&gt;&lt;/p&gt;
 &lt;p&gt;以www.baidu.com为例，最上层根服务器，domain name是&amp;quot;.&amp;quot;，然后有三个hostname &amp;ldquo;net com cn&amp;rdquo;，再到第三层，hostname分别是pdd baidu tencent，此时domain name为.com. ，以此类推。。。需要注意的是，不是每一个&amp;quot;.&amp;ldquo;都拆分domain name&amp;amp;hostname，例如上图  video.www.baidu.com ，其中domain name为baidu.com.，hostname为video.www。按照上述方式分层，每一个服务节点（权威）只负责自己的一小撮域名，这就避免了大量数据集中的问题。&lt;/p&gt;
 &lt;p&gt;DNS阶层系统的最上方是一个&amp;rdquo;.&amp;quot;，root，是根服务器，本质上讲，这里的&amp;quot;.&amp;ldquo;后面其实是空标签，这是为root保留的；根服务器下一层管理的是Top Level Domains(TLD)，例如com. net. org.等等。&lt;/p&gt;
 &lt;p&gt;每个上一层的DNS服务器，所记录的信息，只有下一层的主机名；再下一层，授权给再再下层某个主机管理，这就是分层管理；DNS分层最多到127层(实际上不会用到这么多)，每一层最多63个字符(不包括&amp;rdquo;.&amp;quot;)；同一层内不允许同名，确保唯一性。&lt;/p&gt;
@@ -268,7 +268,7 @@ or 向量间欧式距离
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/dns/2.jpg&#34;&gt;&lt;/p&gt;</description>
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/dns/2.jpg&#34;&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

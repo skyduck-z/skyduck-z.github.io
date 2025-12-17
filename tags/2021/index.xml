@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>2021 on Duck</title>
-    <link>https://duck-dd.github.io/tags/2021/</link>
-    <description>Recent content in 2021 on Duck</description>
+    <title>2021 on skyduck</title>
+    <link>https://skyduck-z.github.io/tags/2021/</link>
+    <description>Recent content in 2021 on skyduck</description>
     <image>
-      <title>Duck</title>
-      <url>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://duck-dd.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
     <lastBuildDate>Sat, 21 Aug 2021 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://duck-dd.github.io/tags/2021/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://skyduck-z.github.io/tags/2021/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang schedule</title>
-      <link>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</link>
+      <link>https://skyduck-z.github.io/posts/2021-08-21-go-schedule/</link>
       <pubDate>Sat, 21 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-08-21-go-schedule/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-08-21-go-schedule/</guid>
       <description>&lt;h2 id=&#34;写在前面&#34;&gt;写在前面&lt;/h2&gt;
 &lt;p&gt;runtime包实现了所有&lt;code&gt;goroutine scheduler&lt;/code&gt;、&lt;code&gt;memory allocator&lt;/code&gt;、&lt;code&gt;garbage collector&lt;/code&gt;细节，理论上可以从runtime包获取一切信息，没有直接怼源码，而是站在巨人的肩膀上（直接吃大佬们吃剩下的）。&lt;/p&gt;
 &lt;p&gt;搜集到的材料，大家都是基于不同的go版本做的分析，而go版本迭代调度算法也在持续更新，所以整理的可能有些乱。但是可以保证的是，所有材料都是GM-&amp;gt;GMP演化后的材料。&lt;/p&gt;
@@ -36,7 +36,7 @@
 &lt;li&gt;对于已经执行完的G，销毁G并立即将M释放回M可用队列供后续使用&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;p&gt;&lt;img alt=&#34;GM-model&#34; loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/go-schedule/gm.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;GM-model&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/go-schedule/gm.png&#34;&gt;&lt;/p&gt;
 &lt;p&gt;那么GM模型有哪些问题呢？&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;(&lt;strong&gt;重点问题&lt;/strong&gt;)单一的全局mutex(sched.lock)和集中状态管理
@@ -372,18 +372,18 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
     </item>
     <item>
       <title>happens-before</title>
-      <link>https://duck-dd.github.io/posts/2021-08-19-happens-before/</link>
+      <link>https://skyduck-z.github.io/posts/2021-08-19-happens-before/</link>
       <pubDate>Thu, 19 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-08-19-happens-before/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-08-19-happens-before/</guid>
       <description>&lt;p&gt;在并发系统中，用于描述事件执行顺序关系；若事件A &amp;ldquo;happens-before&amp;rdquo; 事件B，则A的执行结果对B可见，且A在逻辑上先于B执行(并不要求在物理时间上A必须先于B执行)。&lt;/p&gt;
 &lt;p&gt;所以这其实是一种逻辑关系，在并发系统中，P1 P2 两个过程在逻辑上&amp;quot;同时&amp;quot;在执行，P2过程中的事件B依赖P1过程中的事件A的结果，那么就需要逻辑上的 &amp;ldquo;happens-before&amp;rdquo; 来确保A&amp;amp;B间的依赖关系。&lt;/p&gt;
 &lt;p&gt;常见的并发模型 &lt;strong&gt;共享内存&lt;/strong&gt; 和 &lt;strong&gt;消息传递&lt;/strong&gt;，都遵循 &amp;ldquo;happens-before&amp;quot;逻辑，消息传递中的happens-before好理解，消息的传入肯定是在消息的接收之前的，在共享内存模型的并发中，happens-before就是帮助我们在逻辑上自洽，理清楚不同并发单元(线程 协程 等)对某一个共享内存变量的操作顺序。&lt;/p&gt;</description>
     </item>
     <item>
       <title>离职人生体验</title>
-      <link>https://duck-dd.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</link>
+      <link>https://skyduck-z.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</link>
       <pubDate>Thu, 08 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</guid>
       <description>&lt;p&gt;2018年7月4日，星期三，天气晴。&lt;/p&gt;
 &lt;p&gt;早晨7点半，太阳已经很大，收拾好材料，出发，今天是上班的第一天，也是第一天上班。浑浑噩噩的流程，脑子里什么都没进，然后晕头转向的上了班车，从大厦到了科技园。找工位，认识同事，熟悉环境，然后第一天就心大的开始午睡，睡了2小时，爬起来，心想，坏了，睡过了，然后，发现并没有人关注我，呼～，长出一口气，心想社畜生活貌似还挺轻松。&lt;/p&gt;
 &lt;p&gt;leader下午快到晚饭才开完会（以至于后面很长一段时间我觉得自己菜的评判标准就是没会开，太年轻啊），找到我，“走，一块吃个晚饭”，我怀着无比的尴尬，回，“哥，我吃完了。。。（心想完了第一天就摸鱼还被发现了）”，leader说，那走吧，随便找个空会议室聊两句。“别叫哥，我们这里都不这样叫，直接叫我名字就行”，我心想，业界都传的XX有着最好的氛围，看来是真的，跟学校没什么两样哈。leader说，“BFE听过吧”，我理直气壮的回，“没啊”  （冷场大概有两秒钟吧，这里可能原本应该有十分钟左右的技术交谈，然后大概是临时取消了吧） “我是你的导师，但是平时时间不太充裕，你有问题多问问我们组的人吧，其中还有一个是你的师兄”，“好的”。本次谈话就此结束，我开始回去看材料学习，第一天到底学会了啥，完全不记得了，可能甚至大概都没搞懂BFE全称到底是啥吧。&lt;/p&gt;
@@ -402,9 +402,9 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
     </item>
     <item>
       <title>DNS</title>
-      <link>https://duck-dd.github.io/posts/2021-05-13-dns/</link>
+      <link>https://skyduck-z.github.io/posts/2021-05-13-dns/</link>
       <pubDate>Thu, 13 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://duck-dd.github.io/posts/2021-05-13-dns/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-05-13-dns/</guid>
       <description>&lt;h1 id=&#34;dns&#34;&gt;DNS？&lt;/h1&gt;
 &lt;h2 id=&#34;一些概念&#34;&gt;一些概念&lt;/h2&gt;
 &lt;ul&gt;
@@ -432,7 +432,7 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
 &lt;h3 id=&#34;bind管理方式&#34;&gt;BIND管理方式&lt;/h3&gt;
 &lt;p&gt;BIND是一套阶层式的管理主机名与IP对应关系的系统。&lt;/p&gt;
 &lt;p&gt;阶层式？可以简单理解为树状结构的不同层级，下面来简单分析下阶层式。&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/dns/1.jpg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/dns/1.jpg&#34;&gt;&lt;/p&gt;
 &lt;p&gt;以www.baidu.com为例，最上层根服务器，domain name是&amp;quot;.&amp;quot;，然后有三个hostname &amp;ldquo;net com cn&amp;rdquo;，再到第三层，hostname分别是pdd baidu tencent，此时domain name为.com. ，以此类推。。。需要注意的是，不是每一个&amp;quot;.&amp;ldquo;都拆分domain name&amp;amp;hostname，例如上图  video.www.baidu.com ，其中domain name为baidu.com.，hostname为video.www。按照上述方式分层，每一个服务节点（权威）只负责自己的一小撮域名，这就避免了大量数据集中的问题。&lt;/p&gt;
 &lt;p&gt;DNS阶层系统的最上方是一个&amp;rdquo;.&amp;quot;，root，是根服务器，本质上讲，这里的&amp;quot;.&amp;ldquo;后面其实是空标签，这是为root保留的；根服务器下一层管理的是Top Level Domains(TLD)，例如com. net. org.等等。&lt;/p&gt;
 &lt;p&gt;每个上一层的DNS服务器，所记录的信息，只有下一层的主机名；再下一层，授权给再再下层某个主机管理，这就是分层管理；DNS分层最多到127层(实际上不会用到这么多)，每一层最多63个字符(不包括&amp;rdquo;.&amp;quot;)；同一层内不允许同名，确保唯一性。&lt;/p&gt;
@@ -452,7 +452,7 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://duck-dd.github.io/images/dns/2.jpg&#34;&gt;&lt;/p&gt;</description>
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/dns/2.jpg&#34;&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
