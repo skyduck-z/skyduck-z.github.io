@@ -11,8 +11,15 @@
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 24 Jun 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 20 Dec 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://skyduck-z.github.io/categories/cs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GMP温故知新</title>
+      <link>https://skyduck-z.github.io/posts/2025-12-20-gmp%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</link>
+      <pubDate>Sat, 20 Dec 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2025-12-20-gmp%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</guid>
+      <description></description>
+    </item>
     <item>
       <title>MCMF from scratch</title>
       <link>https://skyduck-z.github.io/posts/2025-06-24-mcmf/</link>
