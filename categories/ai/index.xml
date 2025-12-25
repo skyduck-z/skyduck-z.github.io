@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>AI on skyduck</title>
+    <link>https://skyduck-z.github.io/categories/ai/</link>
+    <description>Recent content in AI on skyduck</description>
+    <image>
+      <title>skyduck</title>
+      <url>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.147.8</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 21 Dec 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://skyduck-z.github.io/categories/ai/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>拥抱AI(持续更新)</title>
+      <link>https://skyduck-z.github.io/posts/2025-12-21-%E6%8B%A5%E6%8A%B1ai%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</link>
+      <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2025-12-21-%E6%8B%A5%E6%8A%B1ai%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</guid>
+      <description>&lt;h1 id=&#34;ai&#34;&gt;AI&lt;/h1&gt;
+&lt;p&gt;概念&amp;amp;现状&amp;amp;未来预期&lt;/p&gt;
+&lt;h1 id=&#34;大方向&#34;&gt;大方向&lt;/h1&gt;
+&lt;h2 id=&#34;llm&#34;&gt;LLM&lt;/h2&gt;
+&lt;h2 id=&#34;agent&#34;&gt;Agent&lt;/h2&gt;
+&lt;h2 id=&#34;具身智能&#34;&gt;具身智能&lt;/h2&gt;
+&lt;h2 id=&#34;软硬协同&#34;&gt;软硬协同&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;{硬件固定,软件可编程} CPU GPU&lt;/li&gt;
+&lt;li&gt;{硬件可编程,软件适配硬件} FPGA(Field Programmable Gate Array, 现场可编程门阵列)&lt;/li&gt;
+&lt;li&gt;{硬件、软件都固定} ASIC(Application Specific Integrated Circuit, 专用集成电路): NPU TPU DPU 矿机芯片&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;技术细节&#34;&gt;技术细节&lt;/h1&gt;
+&lt;h2 id=&#34;ai-pages&#34;&gt;AI pages&lt;/h2&gt;</description>
+    </item>
+  </channel>
+</rss>

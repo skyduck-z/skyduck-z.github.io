@@ -11,8 +11,35 @@
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 20 Dec 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 21 Dec 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://skyduck-z.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>拥抱AI(持续更新)</title>
+      <link>https://skyduck-z.github.io/posts/2025-12-21-%E6%8B%A5%E6%8A%B1ai%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</link>
+      <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2025-12-21-%E6%8B%A5%E6%8A%B1ai%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</guid>
+      <description>&lt;h1 id=&#34;ai&#34;&gt;AI&lt;/h1&gt;
+&lt;p&gt;概念&amp;amp;现状&amp;amp;未来预期&lt;/p&gt;
+&lt;h1 id=&#34;大方向&#34;&gt;大方向&lt;/h1&gt;
+&lt;h2 id=&#34;llm&#34;&gt;LLM&lt;/h2&gt;
+&lt;h2 id=&#34;agent&#34;&gt;Agent&lt;/h2&gt;
+&lt;h2 id=&#34;具身智能&#34;&gt;具身智能&lt;/h2&gt;
+&lt;h2 id=&#34;软硬协同&#34;&gt;软硬协同&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;{硬件固定,软件可编程} CPU GPU&lt;/li&gt;
+&lt;li&gt;{硬件可编程,软件适配硬件} FPGA(Field Programmable Gate Array, 现场可编程门阵列)&lt;/li&gt;
+&lt;li&gt;{硬件、软件都固定} ASIC(Application Specific Integrated Circuit, 专用集成电路): NPU TPU DPU 矿机芯片&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;技术细节&#34;&gt;技术细节&lt;/h1&gt;
+&lt;h2 id=&#34;ai-pages&#34;&gt;AI pages&lt;/h2&gt;</description>
+    </item>
+    <item>
+      <title>过滤器 - 布隆家族</title>
+      <link>https://skyduck-z.github.io/posts/2025-12-21-%E8%BF%87%E6%BB%A4%E5%99%A8---%E5%B8%83%E9%9A%86%E5%AE%B6%E6%97%8F/</link>
+      <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2025-12-21-%E8%BF%87%E6%BB%A4%E5%99%A8---%E5%B8%83%E9%9A%86%E5%AE%B6%E6%97%8F/</guid>
+      <description>&lt;p&gt;TBD.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>GMP温故知新</title>
       <link>https://skyduck-z.github.io/posts/2025-12-20-gmp%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</link>
@@ -620,6 +647,99 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
 正面示例：“在 2024 年 12 月 31 日前完成 V2.0 版本的功能开发并上线”（明确截止时间，可拆分阶段任务）。&lt;/p&gt;</description>
     </item>
     <item>
+      <title>展开讲讲CDN</title>
+      <link>https://skyduck-z.github.io/posts/2025-07-13-%E5%B1%95%E5%BC%80%E8%AE%B2%E8%AE%B2cdn/</link>
+      <pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2025-07-13-%E5%B1%95%E5%BC%80%E8%AE%B2%E8%AE%B2cdn/</guid>
+      <description>&lt;p&gt;TBD.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>怎么做抖音</title>
+      <link>https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/</link>
+      <pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/</guid>
+      <description>&lt;p&gt;前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?”  听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。&lt;/p&gt;
+&lt;p&gt;分几个方向浅浅来看下吧：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;前端&lt;/li&gt;
+&lt;li&gt;后端&lt;/li&gt;
+&lt;li&gt;网络&lt;/li&gt;
+&lt;li&gt;存储&lt;/li&gt;
+&lt;li&gt;算法&lt;/li&gt;
+&lt;li&gt;安全合规&lt;/li&gt;
+&lt;li&gt;生态&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;1-前端&#34;&gt;1. 前端&lt;/h1&gt;
+&lt;p&gt;这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲&lt;/p&gt;
+&lt;h1 id=&#34;2-后端&#34;&gt;2. 后端&lt;/h1&gt;
+&lt;p&gt;技术栈庞大实在储备不足，随便写两句&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;微服务架构,云原生
+&lt;ul&gt;
+&lt;li&gt;技术底座：k8s 容器技术&lt;/li&gt;
+&lt;li&gt;配置管理：配置中心&lt;/li&gt;
+&lt;li&gt;API gateway：统一网关&lt;/li&gt;
+&lt;li&gt;服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等&lt;/li&gt;
+&lt;li&gt;通信：服务发现 服务网格 消息队列&lt;/li&gt;
+&lt;li&gt;治理：可用性 负载均衡(限流、降级、熔断)&lt;/li&gt;
+&lt;li&gt;服务发布&amp;amp;部署：镜像治理 交叉编译 CI/CD 弹性扩缩容&lt;/li&gt;
+&lt;li&gt;可观测可运维(AIOPS)：日志系统(离线日志 在线日志) trace能力 数据体系(监控告警，数据分析看板)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;3-网络用户接入&#34;&gt;3. 网络(用户接入)&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;端：网络库&lt;/li&gt;
+&lt;li&gt;DNS/HTTPDNS(智能调度)&lt;/li&gt;
+&lt;li&gt;Unicast/Anycast&lt;/li&gt;
+&lt;li&gt;CDN(暂不展开)&lt;/li&gt;
+&lt;li&gt;网关
+&lt;ul&gt;
+&lt;li&gt;四层网关&lt;/li&gt;
+&lt;li&gt;七层网关&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;协议栈优化：TCP调优 UDP调优 QUIC DPDK 零拷贝 无锁 分页&lt;/li&gt;
+&lt;li&gt;一些场景
+&lt;ul&gt;
+&lt;li&gt;PCDN&lt;/li&gt;
+&lt;li&gt;弱网优化：协议优化 体验降级(降分辨率&amp;gt;抽帧)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;4-存储&#34;&gt;4. 存储&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;缓存+持久化存储
+&lt;ul&gt;
+&lt;li&gt;缓存：命中率 击穿&lt;/li&gt;
+&lt;li&gt;持久化：压缩 分库分表 读写分离 ACID 分布式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;关系型数据库vs非关系型数据库&lt;/li&gt;
+&lt;li&gt;对象存储&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;5-算法&#34;&gt;5. 算法&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;压缩算法&lt;/li&gt;
+&lt;li&gt;视频算法：视频编解码算法优化&lt;/li&gt;
+&lt;li&gt;调度算法：贪心 稳定匹配 其他？&lt;/li&gt;
+&lt;li&gt;推荐算法：用户画像 内容标签 多阶段递进式 召回+排序(粗排&amp;amp;精排)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;6-安全合规&#34;&gt;6. 安全合规&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;内容安全：bot&lt;/li&gt;
+&lt;li&gt;网络安全：synflood ddos sql注入 等攻击防护&lt;/li&gt;
+&lt;li&gt;合规：不太了解&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;7-生态&#34;&gt;7. 生态&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;开源&lt;/li&gt;
+&lt;li&gt;开发者平台&lt;/li&gt;
+&lt;li&gt;增值服务：例如抖音衍生出的剪映&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;写在最后：其实上述就是浅浅的概括一些点，冷静思考都能想到的问题，但是如果平时不做思考很难能在第一时间按这个全局的思路讲清楚；总-分的结构来看，上述内容思路清晰的说出来，再把岗位相关的技术细节展开来深入讲解和交流，那么应该就能给人一个很好的体验，还是重在平时的积累和思考吧。&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>MCMF from scratch</title>
       <link>https://skyduck-z.github.io/posts/2025-06-24-mcmf/</link>
       <pubDate>Tue, 24 Jun 2025 00:00:00 +0000</pubDate>
@@ -720,9 +840,9 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
     </item>
     <item>
       <title>go tips(持续更新)</title>
-      <link>https://skyduck-z.github.io/posts/2025-06-22-go-tips/</link>
+      <link>https://skyduck-z.github.io/posts/2025-06-22-go-tips%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</link>
       <pubDate>Sun, 22 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://skyduck-z.github.io/posts/2025-06-22-go-tips/</guid>
+      <guid>https://skyduck-z.github.io/posts/2025-06-22-go-tips%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</guid>
       <description>&lt;p&gt;有很多从其他大佬的总结中抄来的，不注明出处了&lt;/p&gt;
 &lt;p&gt;会记录一些:&lt;/p&gt;
 &lt;ul&gt;

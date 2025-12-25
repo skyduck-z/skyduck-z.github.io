@@ -11,13 +11,27 @@
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 20 Dec 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 21 Dec 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://skyduck-z.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>2025</title>
       <link>https://skyduck-z.github.io/tags/2025/</link>
-      <pubDate>Sat, 20 Dec 2025 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
       <guid>https://skyduck-z.github.io/tags/2025/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>AI-Other</title>
+      <link>https://skyduck-z.github.io/tags/ai-other/</link>
+      <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/tags/ai-other/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CS-Other</title>
+      <link>https://skyduck-z.github.io/tags/cs-other/</link>
+      <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/tags/cs-other/</guid>
       <description></description>
     </item>
     <item>
@@ -60,13 +74,6 @@
       <link>https://skyduck-z.github.io/tags/algorithm/</link>
       <pubDate>Tue, 24 Jun 2025 00:00:00 +0000</pubDate>
       <guid>https://skyduck-z.github.io/tags/algorithm/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>CS-Other</title>
-      <link>https://skyduck-z.github.io/tags/cs-other/</link>
-      <pubDate>Tue, 03 Jun 2025 00:00:00 +0000</pubDate>
-      <guid>https://skyduck-z.github.io/tags/cs-other/</guid>
       <description></description>
     </item>
     <item>

@@ -1,0 +1,174 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>怎么做抖音 | skyduck</title><meta name=keywords content="CS-Other,2025"><meta name=description content="前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?”  听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。
+分几个方向浅浅来看下吧：
+
+前端
+后端
+网络
+存储
+算法
+安全合规
+生态
+
+1. 前端
+这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲
+2. 后端
+技术栈庞大实在储备不足，随便写两句
+
+微服务架构,云原生
+
+技术底座：k8s 容器技术
+配置管理：配置中心
+API gateway：统一网关
+服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等
+通信：服务发现 服务网格 消息队列
+治理：可用性 负载均衡(限流、降级、熔断)
+服务发布&部署：镜像治理 交叉编译 CI/CD 弹性扩缩容
+可观测可运维(AIOPS)：日志系统(离线日志 在线日志) trace能力 数据体系(监控告警，数据分析看板)
+
+
+
+3. 网络(用户接入)
+
+端：网络库
+DNS/HTTPDNS(智能调度)
+Unicast/Anycast
+CDN(暂不展开)
+网关
+
+四层网关
+七层网关
+
+
+协议栈优化：TCP调优 UDP调优 QUIC DPDK 零拷贝 无锁 分页
+一些场景
+
+PCDN
+弱网优化：协议优化 体验降级(降分辨率>抽帧)
+
+
+
+4. 存储
+
+缓存+持久化存储
+
+缓存：命中率 击穿
+持久化：压缩 分库分表 读写分离 ACID 分布式
+
+
+关系型数据库vs非关系型数据库
+对象存储
+
+5. 算法
+
+压缩算法
+视频算法：视频编解码算法优化
+调度算法：贪心 稳定匹配 其他？
+推荐算法：用户画像 内容标签 多阶段递进式 召回+排序(粗排&精排)
+
+6. 安全合规
+
+内容安全：bot
+网络安全：synflood ddos sql注入 等攻击防护
+合规：不太了解
+
+7. 生态
+
+开源
+开发者平台
+增值服务：例如抖音衍生出的剪映
+
+写在最后：其实上述就是浅浅的概括一些点，冷静思考都能想到的问题，但是如果平时不做思考很难能在第一时间按这个全局的思路讲清楚；总-分的结构来看，上述内容思路清晰的说出来，再把岗位相关的技术细节展开来深入讲解和交流，那么应该就能给人一个很好的体验，还是重在平时的积累和思考吧。"><meta name=author content><link rel=canonical href=https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/><meta name=google-site-verification content="XYZabc"><meta name=yandex-verification content="XYZabc"><meta name=msvalidate.01 content="XYZabc"><link crossorigin=anonymous href=/assets/css/stylesheet.2a8ef18cccda149eb1cd8ec968ba463447d72022979e5c5cae43dcf5d7358750.css integrity="sha256-Ko7xjMzaFJ6xzY7JaLpGNEfXICKXnlxcrkPc9dc1h1A=" rel="preload stylesheet" as=style><link rel=icon href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=16x16 href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=32x32 href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=apple-touch-icon href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=mask-icon href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous></script><meta property="og:url" content="https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/"><meta property="og:site_name" content="skyduck"><meta property="og:title" content="怎么做抖音"><meta property="og:description" content="前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?” 听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。
+分几个方向浅浅来看下吧：
+前端 后端 网络 存储 算法 安全合规 生态 1. 前端 这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲
+2. 后端 技术栈庞大实在储备不足，随便写两句
+微服务架构,云原生 技术底座：k8s 容器技术 配置管理：配置中心 API gateway：统一网关 服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等 通信：服务发现 服务网格 消息队列 治理：可用性 负载均衡(限流、降级、熔断) 服务发布&部署：镜像治理 交叉编译 CI/CD 弹性扩缩容 可观测可运维(AIOPS)：日志系统(离线日志 在线日志) trace能力 数据体系(监控告警，数据分析看板) 3. 网络(用户接入) 端：网络库 DNS/HTTPDNS(智能调度) Unicast/Anycast CDN(暂不展开) 网关 四层网关 七层网关 协议栈优化：TCP调优 UDP调优 QUIC DPDK 零拷贝 无锁 分页 一些场景 PCDN 弱网优化：协议优化 体验降级(降分辨率>抽帧) 4. 存储 缓存+持久化存储 缓存：命中率 击穿 持久化：压缩 分库分表 读写分离 ACID 分布式 关系型数据库vs非关系型数据库 对象存储 5. 算法 压缩算法 视频算法：视频编解码算法优化 调度算法：贪心 稳定匹配 其他？ 推荐算法：用户画像 内容标签 多阶段递进式 召回+排序(粗排&精排) 6. 安全合规 内容安全：bot 网络安全：synflood ddos sql注入 等攻击防护 合规：不太了解 7. 生态 开源 开发者平台 增值服务：例如抖音衍生出的剪映 写在最后：其实上述就是浅浅的概括一些点，冷静思考都能想到的问题，但是如果平时不做思考很难能在第一时间按这个全局的思路讲清楚；总-分的结构来看，上述内容思路清晰的说出来，再把岗位相关的技术细节展开来深入讲解和交流，那么应该就能给人一个很好的体验，还是重在平时的积累和思考吧。"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-07-13T00:00:00+00:00"><meta property="article:modified_time" content="2025-07-13T00:00:00+00:00"><meta property="article:tag" content="CS-Other"><meta property="article:tag" content="2025"><meta property="og:image" content="https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="怎么做抖音"><meta name=twitter:description content="前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?”  听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。
+分几个方向浅浅来看下吧：
+
+前端
+后端
+网络
+存储
+算法
+安全合规
+生态
+
+1. 前端
+这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲
+2. 后端
+技术栈庞大实在储备不足，随便写两句
+
+微服务架构,云原生
+
+技术底座：k8s 容器技术
+配置管理：配置中心
+API gateway：统一网关
+服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等
+通信：服务发现 服务网格 消息队列
+治理：可用性 负载均衡(限流、降级、熔断)
+服务发布&部署：镜像治理 交叉编译 CI/CD 弹性扩缩容
+可观测可运维(AIOPS)：日志系统(离线日志 在线日志) trace能力 数据体系(监控告警，数据分析看板)
+
+
+
+3. 网络(用户接入)
+
+端：网络库
+DNS/HTTPDNS(智能调度)
+Unicast/Anycast
+CDN(暂不展开)
+网关
+
+四层网关
+七层网关
+
+
+协议栈优化：TCP调优 UDP调优 QUIC DPDK 零拷贝 无锁 分页
+一些场景
+
+PCDN
+弱网优化：协议优化 体验降级(降分辨率>抽帧)
+
+
+
+4. 存储
+
+缓存+持久化存储
+
+缓存：命中率 击穿
+持久化：压缩 分库分表 读写分离 ACID 分布式
+
+
+关系型数据库vs非关系型数据库
+对象存储
+
+5. 算法
+
+压缩算法
+视频算法：视频编解码算法优化
+调度算法：贪心 稳定匹配 其他？
+推荐算法：用户画像 内容标签 多阶段递进式 召回+排序(粗排&精排)
+
+6. 安全合规
+
+内容安全：bot
+网络安全：synflood ddos sql注入 等攻击防护
+合规：不太了解
+
+7. 生态
+
+开源
+开发者平台
+增值服务：例如抖音衍生出的剪映
+
+写在最后：其实上述就是浅浅的概括一些点，冷静思考都能想到的问题，但是如果平时不做思考很难能在第一时间按这个全局的思路讲清楚；总-分的结构来看，上述内容思路清晰的说出来，再把岗位相关的技术细节展开来深入讲解和交流，那么应该就能给人一个很好的体验，还是重在平时的积累和思考吧。"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://skyduck-z.github.io/posts/"},{"@type":"ListItem","position":2,"name":"怎么做抖音","item":"https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"怎么做抖音","name":"怎么做抖音","description":"前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?” 听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。\n分几个方向浅浅来看下吧：\n前端 后端 网络 存储 算法 安全合规 生态 1. 前端 这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲\n2. 后端 技术栈庞大实在储备不足，随便写两句\n微服务架构,云原生 技术底座：k8s 容器技术 配置管理：配置中心 API gateway：统一网关 服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等 通信：服务发现 服务网格 消息队列 治理：可用性 负载均衡(限流、降级、熔断) 服务发布\u0026amp;部署：镜像治理 交叉编译 CI/CD 弹性扩缩容 可观测可运维(AIOPS)：日志系统(离线日志 在线日志) trace能力 数据体系(监控告警，数据分析看板) 3. 网络(用户接入) 端：网络库 DNS/HTTPDNS(智能调度) Unicast/Anycast CDN(暂不展开) 网关 四层网关 七层网关 协议栈优化：TCP调优 UDP调优 QUIC DPDK 零拷贝 无锁 分页 一些场景 PCDN 弱网优化：协议优化 体验降级(降分辨率\u0026gt;抽帧) 4. 存储 缓存+持久化存储 缓存：命中率 击穿 持久化：压缩 分库分表 读写分离 ACID 分布式 关系型数据库vs非关系型数据库 对象存储 5. 算法 压缩算法 视频算法：视频编解码算法优化 调度算法：贪心 稳定匹配 其他？ 推荐算法：用户画像 内容标签 多阶段递进式 召回+排序(粗排\u0026amp;精排) 6. 安全合规 内容安全：bot 网络安全：synflood ddos sql注入 等攻击防护 合规：不太了解 7. 生态 开源 开发者平台 增值服务：例如抖音衍生出的剪映 写在最后：其实上述就是浅浅的概括一些点，冷静思考都能想到的问题，但是如果平时不做思考很难能在第一时间按这个全局的思路讲清楚；总-分的结构来看，上述内容思路清晰的说出来，再把岗位相关的技术细节展开来深入讲解和交流，那么应该就能给人一个很好的体验，还是重在平时的积累和思考吧。\n","keywords":["CS-Other","2025"],"articleBody":"前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?” 听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。\n分几个方向浅浅来看下吧：\n前端 后端 网络 存储 算法 安全合规 生态 1. 前端 这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲\n2. 后端 技术栈庞大实在储备不足，随便写两句\n微服务架构,云原生 技术底座：k8s 容器技术 配置管理：配置中心 API gateway：统一网关 服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等 通信：服务发现 服务网格 消息队列 治理：可用性 负载均衡(限流、降级、熔断) 服务发布\u0026部署：镜像治理 交叉编译 CI/CD 弹性扩缩容 可观测可运维(AIOPS)：日志系统(离线日志 在线日志) trace能力 数据体系(监控告警，数据分析看板) 3. 网络(用户接入) 端：网络库 DNS/HTTPDNS(智能调度) Unicast/Anycast CDN(暂不展开) 网关 四层网关 七层网关 协议栈优化：TCP调优 UDP调优 QUIC DPDK 零拷贝 无锁 分页 一些场景 PCDN 弱网优化：协议优化 体验降级(降分辨率\u003e抽帧) 4. 存储 缓存+持久化存储 缓存：命中率 击穿 持久化：压缩 分库分表 读写分离 ACID 分布式 关系型数据库vs非关系型数据库 对象存储 5. 算法 压缩算法 视频算法：视频编解码算法优化 调度算法：贪心 稳定匹配 其他？ 推荐算法：用户画像 内容标签 多阶段递进式 召回+排序(粗排\u0026精排) 6. 安全合规 内容安全：bot 网络安全：synflood ddos sql注入 等攻击防护 合规：不太了解 7. 生态 开源 开发者平台 增值服务：例如抖音衍生出的剪映 写在最后：其实上述就是浅浅的概括一些点，冷静思考都能想到的问题，但是如果平时不做思考很难能在第一时间按这个全局的思路讲清楚；总-分的结构来看，上述内容思路清晰的说出来，再把岗位相关的技术细节展开来深入讲解和交流，那么应该就能给人一个很好的体验，还是重在平时的积累和思考吧。\n","wordCount":"95","inLanguage":"en","image":"https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E","datePublished":"2025-07-13T00:00:00Z","dateModified":"2025-07-13T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/"},"publisher":{"@type":"Organization","name":"skyduck","logo":{"@type":"ImageObject","url":"https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://skyduck-z.github.io/ accesskey=h title="首页 (Alt + H)"><img src=https://skyduck-z.github.io/apple-touch-icon.png alt aria-label=logo height=35>首页</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://skyduck-z.github.io/categories/ title=分类><span>分类</span></a></li><li><a href=https://skyduck-z.github.io/tags/ title=标签><span>标签</span></a></li><li><a href=https://skyduck-z.github.io/about_me title=关于我><span>关于我</span></a></li><li><a href=https://skyduck-z.github.io/about_space title=关于这里><span>关于这里</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://skyduck-z.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://skyduck-z.github.io/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">怎么做抖音</h1><div class=post-meta><span title='2025-07-13 00:00:00 +0000 UTC'>2025-07-13</span>&nbsp;·&nbsp;创建于:&nbsp;2025-07-13&nbsp;·&nbsp;1 min&nbsp;·&nbsp;95 words<div class=meta-item>&nbsp·&nbsp
+<a href=https://skyduck-z.github.io/categories/cs/>CS</a></div><div class=meta-item>&nbsp·&nbsp
+<a href=https://skyduck-z.github.io/tags/cs-other/>CS-Other</a>
+<span>,</span>
+<a href=https://skyduck-z.github.io/tags/2025/>2025</a></div></div></header><aside id=toc-container class="toc-container wide"><div class=toc><details open><summary accesskey=c title="(Alt + C)"><span class=details>目录</span></summary><div class=inner><ul><li><a href=#1-%e5%89%8d%e7%ab%af aria-label="1. 前端">1. 前端</a></li><li><a href=#2-%e5%90%8e%e7%ab%af aria-label="2. 后端">2. 后端</a></li><li><a href=#3-%e7%bd%91%e7%bb%9c%e7%94%a8%e6%88%b7%e6%8e%a5%e5%85%a5 aria-label="3. 网络(用户接入)">3. 网络(用户接入)</a></li><li><a href=#4-%e5%ad%98%e5%82%a8 aria-label="4. 存储">4. 存储</a></li><li><a href=#5-%e7%ae%97%e6%b3%95 aria-label="5. 算法">5. 算法</a></li><li><a href=#6-%e5%ae%89%e5%85%a8%e5%90%88%e8%a7%84 aria-label="6. 安全合规">6. 安全合规</a></li><li><a href=#7-%e7%94%9f%e6%80%81 aria-label="7. 生态">7. 生态</a></li></ul></div></details></div></aside><script>let activeElement,elements;window.addEventListener("DOMContentLoaded",function(){checkTocPosition(),elements=document.querySelectorAll("h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]"),activeElement=elements[0];const t=encodeURI(activeElement.getAttribute("id")).toLowerCase();document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active")},!1),window.addEventListener("resize",function(){checkTocPosition()},!1),window.addEventListener("scroll",()=>{activeElement=Array.from(elements).find(e=>{if(getOffsetTop(e)-window.pageYOffset>0&&getOffsetTop(e)-window.pageYOffset<window.innerHeight/2)return e})||activeElement,elements.forEach(e=>{const t=encodeURI(e.getAttribute("id")).toLowerCase();e===activeElement?document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active"):document.querySelector(`.inner ul li a[href="#${t}"]`).classList.remove("active")})},!1);const main=parseInt(getComputedStyle(document.body).getPropertyValue("--article-width"),10),toc=parseInt(getComputedStyle(document.body).getPropertyValue("--toc-width"),10),gap=parseInt(getComputedStyle(document.body).getPropertyValue("--gap"),10);function checkTocPosition(){const e=document.body.scrollWidth;e-main-toc*2-gap*4>0?document.getElementById("toc-container").classList.add("wide"):document.getElementById("toc-container").classList.remove("wide")}function getOffsetTop(e){if(!e.getClientRects().length)return 0;let t=e.getBoundingClientRect(),n=e.ownerDocument.defaultView;return t.top+n.pageYOffset}</script><div class=post-content><p>前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?” 听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。</p><p>分几个方向浅浅来看下吧：</p><ol><li>前端</li><li>后端</li><li>网络</li><li>存储</li><li>算法</li><li>安全合规</li><li>生态</li></ol><h1 id=1-前端>1. 前端<a hidden class=anchor aria-hidden=true href=#1-前端>#</a></h1><p>这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲</p><h1 id=2-后端>2. 后端<a hidden class=anchor aria-hidden=true href=#2-后端>#</a></h1><p>技术栈庞大实在储备不足，随便写两句</p><ul><li>微服务架构,云原生<ul><li>技术底座：k8s 容器技术</li><li>配置管理：配置中心</li><li>API gateway：统一网关</li><li>服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等</li><li>通信：服务发现 服务网格 消息队列</li><li>治理：可用性 负载均衡(限流、降级、熔断)</li><li>服务发布&部署：镜像治理 交叉编译 CI/CD 弹性扩缩容</li><li>可观测可运维(AIOPS)：日志系统(离线日志 在线日志) trace能力 数据体系(监控告警，数据分析看板)</li></ul></li></ul><h1 id=3-网络用户接入>3. 网络(用户接入)<a hidden class=anchor aria-hidden=true href=#3-网络用户接入>#</a></h1><ul><li>端：网络库</li><li>DNS/HTTPDNS(智能调度)</li><li>Unicast/Anycast</li><li>CDN(暂不展开)</li><li>网关<ul><li>四层网关</li><li>七层网关</li></ul></li><li>协议栈优化：TCP调优 UDP调优 QUIC DPDK 零拷贝 无锁 分页</li><li>一些场景<ul><li>PCDN</li><li>弱网优化：协议优化 体验降级(降分辨率>抽帧)</li></ul></li></ul><h1 id=4-存储>4. 存储<a hidden class=anchor aria-hidden=true href=#4-存储>#</a></h1><ul><li>缓存+持久化存储<ul><li>缓存：命中率 击穿</li><li>持久化：压缩 分库分表 读写分离 ACID 分布式</li></ul></li><li>关系型数据库vs非关系型数据库</li><li>对象存储</li></ul><h1 id=5-算法>5. 算法<a hidden class=anchor aria-hidden=true href=#5-算法>#</a></h1><ul><li>压缩算法</li><li>视频算法：视频编解码算法优化</li><li>调度算法：贪心 稳定匹配 其他？</li><li>推荐算法：用户画像 内容标签 多阶段递进式 召回+排序(粗排&精排)</li></ul><h1 id=6-安全合规>6. 安全合规<a hidden class=anchor aria-hidden=true href=#6-安全合规>#</a></h1><ul><li>内容安全：bot</li><li>网络安全：synflood ddos sql注入 等攻击防护</li><li>合规：不太了解</li></ul><h1 id=7-生态>7. 生态<a hidden class=anchor aria-hidden=true href=#7-生态>#</a></h1><ul><li>开源</li><li>开发者平台</li><li>增值服务：例如抖音衍生出的剪映</li></ul><p>写在最后：其实上述就是浅浅的概括一些点，冷静思考都能想到的问题，但是如果平时不做思考很难能在第一时间按这个全局的思路讲清楚；总-分的结构来看，上述内容思路清晰的说出来，再把岗位相关的技术细节展开来深入讲解和交流，那么应该就能给人一个很好的体验，还是重在平时的积累和思考吧。</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://skyduck-z.github.io/tags/cs-other/>CS-Other</a></li><li><a href=https://skyduck-z.github.io/tags/2025/>2025</a></li></ul><nav class=paginav><a class=prev href=https://skyduck-z.github.io/posts/2025-07-13-%E5%B1%95%E5%BC%80%E8%AE%B2%E8%AE%B2cdn/><span class=title>« Prev</span><br><span>展开讲讲CDN</span>
+</a><a class=next href=https://skyduck-z.github.io/posts/2025-06-24-mcmf/><span class=title>Next »</span><br><span>MCMF from scratch</span></a></nav></footer><script src=https://utteranc.es/client.js repo=skyduck-z/blog-comment issue-term=pathname label='💬 Comments' theme=github-light crossorigin=anonymous async></script></article></main><footer class=footer><span>&copy; 2025 <a href=https://skyduck-z.github.io/>skyduck</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$",right:"$",display:!1},{left:"$$",right:"$$",display:!0}],throwOnError:!1})})</script></body></html>
