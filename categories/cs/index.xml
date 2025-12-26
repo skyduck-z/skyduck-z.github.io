@@ -25,7 +25,7 @@
       <link>https://skyduck-z.github.io/posts/2025-12-20-gmp%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</link>
       <pubDate>Sat, 20 Dec 2025 00:00:00 +0000</pubDate>
       <guid>https://skyduck-z.github.io/posts/2025-12-20-gmp%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</guid>
-      <description></description>
+      <description>&lt;p&gt;TBD.&lt;/p&gt;</description>
     </item>
     <item>
       <title>展开讲讲CDN</title>
@@ -60,6 +60,7 @@
 &lt;li&gt;技术底座：k8s 容器技术&lt;/li&gt;
 &lt;li&gt;配置管理：配置中心&lt;/li&gt;
 &lt;li&gt;API gateway：统一网关&lt;/li&gt;
+&lt;li&gt;中间件：etcd es auth等&lt;/li&gt;
 &lt;li&gt;服务拆分：结合产品特性拆分子服务，用户中心、内容中心、评论点赞中心 等&lt;/li&gt;
 &lt;li&gt;通信：服务发现 服务网格 消息队列&lt;/li&gt;
 &lt;li&gt;治理：可用性 负载均衡(限流、降级、熔断)&lt;/li&gt;
@@ -108,7 +109,7 @@
 &lt;/ul&gt;
 &lt;h1 id=&#34;6-安全合规&#34;&gt;6. 安全合规&lt;/h1&gt;
 &lt;ul&gt;
-&lt;li&gt;内容安全：bot&lt;/li&gt;
+&lt;li&gt;内容安全：bot 抽帧审核&lt;/li&gt;
 &lt;li&gt;网络安全：synflood ddos sql注入 等攻击防护&lt;/li&gt;
 &lt;li&gt;合规：不太了解&lt;/li&gt;
 &lt;/ul&gt;

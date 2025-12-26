@@ -380,10 +380,10 @@ g0是带有调度栈的goroutine，普通的G的栈是分配在堆上的可增�
 &lt;p&gt;常见的并发模型 &lt;strong&gt;共享内存&lt;/strong&gt; 和 &lt;strong&gt;消息传递&lt;/strong&gt;，都遵循 &amp;ldquo;happens-before&amp;quot;逻辑，消息传递中的happens-before好理解，消息的传入肯定是在消息的接收之前的，在共享内存模型的并发中，happens-before就是帮助我们在逻辑上自洽，理清楚不同并发单元(线程 协程 等)对某一个共享内存变量的操作顺序。&lt;/p&gt;</description>
     </item>
     <item>
-      <title>离职人生体验</title>
-      <link>https://skyduck-z.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</link>
+      <title>人生体验-离职</title>
+      <link>https://skyduck-z.github.io/posts/2021-07-08-%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C-%E7%A6%BB%E8%81%8C/</link>
       <pubDate>Thu, 08 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://skyduck-z.github.io/posts/2021-07-08-%E7%A6%BB%E8%81%8C%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C/</guid>
+      <guid>https://skyduck-z.github.io/posts/2021-07-08-%E4%BA%BA%E7%94%9F%E4%BD%93%E9%AA%8C-%E7%A6%BB%E8%81%8C/</guid>
       <description>&lt;p&gt;2018年7月4日，星期三，天气晴。&lt;/p&gt;
 &lt;p&gt;早晨7点半，太阳已经很大，收拾好材料，出发，今天是上班的第一天，也是第一天上班。浑浑噩噩的流程，脑子里什么都没进，然后晕头转向的上了班车，从大厦到了科技园。找工位，认识同事，熟悉环境，然后第一天就心大的开始午睡，睡了2小时，爬起来，心想，坏了，睡过了，然后，发现并没有人关注我，呼～，长出一口气，心想社畜生活貌似还挺轻松。&lt;/p&gt;
 &lt;p&gt;leader下午快到晚饭才开完会（以至于后面很长一段时间我觉得自己菜的评判标准就是没会开，太年轻啊），找到我，“走，一块吃个晚饭”，我怀着无比的尴尬，回，“哥，我吃完了。。。（心想完了第一天就摸鱼还被发现了）”，leader说，那走吧，随便找个空会议室聊两句。“别叫哥，我们这里都不这样叫，直接叫我名字就行”，我心想，业界都传的XX有着最好的氛围，看来是真的，跟学校没什么两样哈。leader说，“BFE听过吧”，我理直气壮的回，“没啊”  （冷场大概有两秒钟吧，这里可能原本应该有十分钟左右的技术交谈，然后大概是临时取消了吧） “我是你的导师，但是平时时间不太充裕，你有问题多问问我们组的人吧，其中还有一个是你的师兄”，“好的”。本次谈话就此结束，我开始回去看材料学习，第一天到底学会了啥，完全不记得了，可能甚至大概都没搞懂BFE全称到底是啥吧。&lt;/p&gt;
