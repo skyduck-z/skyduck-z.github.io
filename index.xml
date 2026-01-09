@@ -848,11 +848,80 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
 &lt;/ul&gt;</description>
     </item>
     <item>
-      <title>展开讲讲CDN</title>
-      <link>https://skyduck-z.github.io/posts/2025-07-13-%E5%B1%95%E5%BC%80%E8%AE%B2%E8%AE%B2cdn/</link>
+      <title>CDN</title>
+      <link>https://skyduck-z.github.io/posts/2025-07-13-cdn/</link>
       <pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate>
-      <guid>https://skyduck-z.github.io/posts/2025-07-13-%E5%B1%95%E5%BC%80%E8%AE%B2%E8%AE%B2cdn/</guid>
-      <description>&lt;p&gt;TBD.&lt;/p&gt;</description>
+      <guid>https://skyduck-z.github.io/posts/2025-07-13-cdn/</guid>
+      <description>&lt;h1 id=&#34;什么是cdn&#34;&gt;什么是CDN&lt;/h1&gt;
+&lt;p&gt;CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层&amp;quot;智能分布式网络&amp;quot;&lt;/p&gt;
+&lt;h1 id=&#34;cdn的流量接入&#34;&gt;CDN的流量接入&lt;/h1&gt;
+&lt;h2 id=&#34;节点&#34;&gt;节点&lt;/h2&gt;
+&lt;h3 id=&#34;l1边缘节点&#34;&gt;L1(边缘节点)&lt;/h3&gt;
+&lt;h3 id=&#34;l2&#34;&gt;L2&lt;/h3&gt;
+&lt;h3 id=&#34;l3&#34;&gt;L3&lt;/h3&gt;
+&lt;h3 id=&#34;源站&#34;&gt;源站&lt;/h3&gt;
+&lt;h1 id=&#34;缓存&#34;&gt;缓存&lt;/h1&gt;
+&lt;h2 id=&#34;命中率回源带宽&#34;&gt;命中率&amp;amp;回源带宽&lt;/h2&gt;
+&lt;h2 id=&#34;存储模型&#34;&gt;存储模型&lt;/h2&gt;
+&lt;h2 id=&#34;内存淘汰算法&#34;&gt;内存淘汰算法&lt;/h2&gt;
+&lt;h1 id=&#34;调度&#34;&gt;调度&lt;/h1&gt;
+&lt;h2 id=&#34;dnsanycast&#34;&gt;[DNS]&amp;amp;[Anycast]&lt;/h2&gt;
+&lt;h2 id=&#34;资源建设质量调度成本调度&#34;&gt;[资源建设]&amp;amp;[质量调度]&amp;amp;[成本调度]&lt;/h2&gt;
+&lt;h3 id=&#34;资源建设&#34;&gt;资源建设&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;资源匹配
+&lt;ul&gt;
+&lt;li&gt;就近接入，流量&amp;amp;容量匹配&lt;/li&gt;
+&lt;li&gt;按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;质量调度&#34;&gt;质量调度&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;探测系统
+&lt;ul&gt;
+&lt;li&gt;外采：博睿等公司&lt;/li&gt;
+&lt;li&gt;自建拨测系统&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;用户接入质量
+&lt;ul&gt;
+&lt;li&gt;正向探测(客户端-&amp;gt;接入ip)&lt;/li&gt;
+&lt;li&gt;反向探测(服务端-&amp;gt;客户端)&lt;/li&gt;
+&lt;li&gt;质量信号维度
+&lt;ul&gt;
+&lt;li&gt;运营商 -&amp;gt; 接入点(或ip粒度)：运营商可能有封ip行为&lt;/li&gt;
+&lt;li&gt;运营商 -&amp;gt; 接入点(或ip粒度)端口：运营商可能有封端口行为&lt;/li&gt;
+&lt;li&gt;省份(区域) -&amp;gt; 接入点(或ip粒度)&lt;/li&gt;
+&lt;li&gt;省份*运营商 -&amp;gt; 接入点(或ip粒度)&lt;/li&gt;
+&lt;li&gt;省份*运营商 -&amp;gt; 接入点(或ip粒度)端口&lt;/li&gt;
+&lt;li&gt;省份&lt;em&gt;运营商&lt;/em&gt;HOST -&amp;gt; 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来&lt;/li&gt;
+&lt;li&gt;URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;成本调度&#34;&gt;成本调度&lt;/h3&gt;
+&lt;p&gt;低价资源募集
+价差调度
+削峰填谷&lt;/p&gt;
+&lt;h2 id=&#34;回源调度&#34;&gt;[回源调度]&lt;/h2&gt;
+&lt;h1 id=&#34;业务类型&#34;&gt;业务类型&lt;/h1&gt;
+&lt;h2 id=&#34;下载&#34;&gt;下载&lt;/h2&gt;
+&lt;p&gt;压缩
+小文件/大文件&lt;/p&gt;
+&lt;h2 id=&#34;点播&#34;&gt;点播&lt;/h2&gt;
+&lt;h3 id=&#34;流媒体传输&#34;&gt;流媒体传输&lt;/h3&gt;
+&lt;p&gt;切片(TS, Transport Stream)
+协议支持/优化：HLS,DASH,CMAF,FLV,RTMP&lt;/p&gt;
+&lt;h2 id=&#34;图片&#34;&gt;图片&lt;/h2&gt;
+&lt;h3 id=&#34;图片处理&#34;&gt;图片处理&lt;/h3&gt;
+&lt;p&gt;格式转换
+裁剪&amp;amp;缩放
+有损/无损压缩
+渐进式加载(模糊图-&amp;gt;清晰图)
+图像特效处理：水印 亮度/对比度等参数调节 旋转 等等&lt;/p&gt;</description>
     </item>
     <item>
       <title>怎么做抖音</title>

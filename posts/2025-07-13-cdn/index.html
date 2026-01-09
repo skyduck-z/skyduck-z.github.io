@@ -1,0 +1,162 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>CDN | skyduck</title><meta name=keywords content="CS-Other,2025"><meta name=description content='什么是CDN
+CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层"智能分布式网络"
+CDN的流量接入
+节点
+L1(边缘节点)
+L2
+L3
+源站
+缓存
+命中率&回源带宽
+存储模型
+内存淘汰算法
+调度
+[DNS]&[Anycast]
+[资源建设]&[质量调度]&[成本调度]
+资源建设
+
+资源匹配
+
+就近接入，流量&容量匹配
+按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配
+
+
+
+质量调度
+
+探测系统
+
+外采：博睿等公司
+自建拨测系统
+
+
+用户接入质量
+
+正向探测(客户端->接入ip)
+反向探测(服务端->客户端)
+质量信号维度
+
+运营商 -> 接入点(或ip粒度)：运营商可能有封ip行为
+运营商 -> 接入点(或ip粒度)端口：运营商可能有封端口行为
+省份(区域) -> 接入点(或ip粒度)
+省份*运营商 -> 接入点(或ip粒度)
+省份*运营商 -> 接入点(或ip粒度)端口
+省份运营商HOST -> 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来
+URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度
+
+
+
+
+
+成本调度
+低价资源募集
+价差调度
+削峰填谷
+[回源调度]
+业务类型
+下载
+压缩
+小文件/大文件
+点播
+流媒体传输
+切片(TS, Transport Stream)
+协议支持/优化：HLS,DASH,CMAF,FLV,RTMP
+图片
+图片处理
+格式转换
+裁剪&缩放
+有损/无损压缩
+渐进式加载(模糊图->清晰图)
+图像特效处理：水印 亮度/对比度等参数调节 旋转 等等'><meta name=author content><link rel=canonical href=https://skyduck-z.github.io/posts/2025-07-13-cdn/><meta name=google-site-verification content="XYZabc"><meta name=yandex-verification content="XYZabc"><meta name=msvalidate.01 content="XYZabc"><link crossorigin=anonymous href=/assets/css/stylesheet.2a8ef18cccda149eb1cd8ec968ba463447d72022979e5c5cae43dcf5d7358750.css integrity="sha256-Ko7xjMzaFJ6xzY7JaLpGNEfXICKXnlxcrkPc9dc1h1A=" rel="preload stylesheet" as=style><link rel=icon href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=16x16 href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=32x32 href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=apple-touch-icon href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><link rel=mask-icon href=https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://skyduck-z.github.io/posts/2025-07-13-cdn/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous></script><meta property="og:url" content="https://skyduck-z.github.io/posts/2025-07-13-cdn/"><meta property="og:site_name" content="skyduck"><meta property="og:title" content="CDN"><meta property="og:description" content='什么是CDN CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层"智能分布式网络"
+CDN的流量接入 节点 L1(边缘节点) L2 L3 源站 缓存 命中率&回源带宽 存储模型 内存淘汰算法 调度 [DNS]&[Anycast] [资源建设]&[质量调度]&[成本调度] 资源建设 资源匹配 就近接入，流量&容量匹配 按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配 质量调度 探测系统 外采：博睿等公司 自建拨测系统 用户接入质量 正向探测(客户端->接入ip) 反向探测(服务端->客户端) 质量信号维度 运营商 -> 接入点(或ip粒度)：运营商可能有封ip行为 运营商 -> 接入点(或ip粒度)端口：运营商可能有封端口行为 省份(区域) -> 接入点(或ip粒度) 省份*运营商 -> 接入点(或ip粒度) 省份*运营商 -> 接入点(或ip粒度)端口 省份运营商HOST -> 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来 URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度 成本调度 低价资源募集 价差调度 削峰填谷
+[回源调度] 业务类型 下载 压缩 小文件/大文件
+点播 流媒体传输 切片(TS, Transport Stream) 协议支持/优化：HLS,DASH,CMAF,FLV,RTMP
+图片 图片处理 格式转换 裁剪&缩放 有损/无损压缩 渐进式加载(模糊图->清晰图) 图像特效处理：水印 亮度/对比度等参数调节 旋转 等等'><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-07-13T00:00:00+00:00"><meta property="article:modified_time" content="2025-07-13T00:00:00+00:00"><meta property="article:tag" content="CS-Other"><meta property="article:tag" content="2025"><meta property="og:image" content="https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="CDN"><meta name=twitter:description content='什么是CDN
+CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层"智能分布式网络"
+CDN的流量接入
+节点
+L1(边缘节点)
+L2
+L3
+源站
+缓存
+命中率&回源带宽
+存储模型
+内存淘汰算法
+调度
+[DNS]&[Anycast]
+[资源建设]&[质量调度]&[成本调度]
+资源建设
+
+资源匹配
+
+就近接入，流量&容量匹配
+按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配
+
+
+
+质量调度
+
+探测系统
+
+外采：博睿等公司
+自建拨测系统
+
+
+用户接入质量
+
+正向探测(客户端->接入ip)
+反向探测(服务端->客户端)
+质量信号维度
+
+运营商 -> 接入点(或ip粒度)：运营商可能有封ip行为
+运营商 -> 接入点(或ip粒度)端口：运营商可能有封端口行为
+省份(区域) -> 接入点(或ip粒度)
+省份*运营商 -> 接入点(或ip粒度)
+省份*运营商 -> 接入点(或ip粒度)端口
+省份运营商HOST -> 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来
+URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度
+
+
+
+
+
+成本调度
+低价资源募集
+价差调度
+削峰填谷
+[回源调度]
+业务类型
+下载
+压缩
+小文件/大文件
+点播
+流媒体传输
+切片(TS, Transport Stream)
+协议支持/优化：HLS,DASH,CMAF,FLV,RTMP
+图片
+图片处理
+格式转换
+裁剪&缩放
+有损/无损压缩
+渐进式加载(模糊图->清晰图)
+图像特效处理：水印 亮度/对比度等参数调节 旋转 等等'><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://skyduck-z.github.io/posts/"},{"@type":"ListItem","position":2,"name":"CDN","item":"https://skyduck-z.github.io/posts/2025-07-13-cdn/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"CDN","name":"CDN","description":"什么是CDN CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层\u0026quot;智能分布式网络\u0026quot;\nCDN的流量接入 节点 L1(边缘节点) L2 L3 源站 缓存 命中率\u0026amp;回源带宽 存储模型 内存淘汰算法 调度 [DNS]\u0026amp;[Anycast] [资源建设]\u0026amp;[质量调度]\u0026amp;[成本调度] 资源建设 资源匹配 就近接入，流量\u0026amp;容量匹配 按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配 质量调度 探测系统 外采：博睿等公司 自建拨测系统 用户接入质量 正向探测(客户端-\u0026gt;接入ip) 反向探测(服务端-\u0026gt;客户端) 质量信号维度 运营商 -\u0026gt; 接入点(或ip粒度)：运营商可能有封ip行为 运营商 -\u0026gt; 接入点(或ip粒度)端口：运营商可能有封端口行为 省份(区域) -\u0026gt; 接入点(或ip粒度) 省份*运营商 -\u0026gt; 接入点(或ip粒度) 省份*运营商 -\u0026gt; 接入点(或ip粒度)端口 省份运营商HOST -\u0026gt; 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来 URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度 成本调度 低价资源募集 价差调度 削峰填谷\n[回源调度] 业务类型 下载 压缩 小文件/大文件\n点播 流媒体传输 切片(TS, Transport Stream) 协议支持/优化：HLS,DASH,CMAF,FLV,RTMP\n图片 图片处理 格式转换 裁剪\u0026amp;缩放 有损/无损压缩 渐进式加载(模糊图-\u0026gt;清晰图) 图像特效处理：水印 亮度/对比度等参数调节 旋转 等等\n","keywords":["CS-Other","2025"],"articleBody":"什么是CDN CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层\"智能分布式网络\"\nCDN的流量接入 节点 L1(边缘节点) L2 L3 源站 缓存 命中率\u0026回源带宽 存储模型 内存淘汰算法 调度 [DNS]\u0026[Anycast] [资源建设]\u0026[质量调度]\u0026[成本调度] 资源建设 资源匹配 就近接入，流量\u0026容量匹配 按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配 质量调度 探测系统 外采：博睿等公司 自建拨测系统 用户接入质量 正向探测(客户端-\u003e接入ip) 反向探测(服务端-\u003e客户端) 质量信号维度 运营商 -\u003e 接入点(或ip粒度)：运营商可能有封ip行为 运营商 -\u003e 接入点(或ip粒度)端口：运营商可能有封端口行为 省份(区域) -\u003e 接入点(或ip粒度) 省份*运营商 -\u003e 接入点(或ip粒度) 省份*运营商 -\u003e 接入点(或ip粒度)端口 省份运营商HOST -\u003e 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来 URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度 成本调度 低价资源募集 价差调度 削峰填谷\n[回源调度] 业务类型 下载 压缩 小文件/大文件\n点播 流媒体传输 切片(TS, Transport Stream) 协议支持/优化：HLS,DASH,CMAF,FLV,RTMP\n图片 图片处理 格式转换 裁剪\u0026缩放 有损/无损压缩 渐进式加载(模糊图-\u003e清晰图) 图像特效处理：水印 亮度/对比度等参数调节 旋转 等等\n直播 动态 DCDN 前沿方向 现在说到前沿一般都会联想到AI、大模型，CDN作为传统技术，大佬们都在做啥前沿探索？\n行业 第三方厂商 这类公司提供的服务一般更接近基础网络建设/机房资源建设，目标客户群体也是最终的CDN服务提供商。\nCDN77 Zenlayer KPY 海外 Akamai Cloudflare Amazon CloudFront(AWS) Google Cloud CDN(GCP) Fastly 国内 云厂商 阿里云CDN 腾讯云CDN 华为云CDN 百度智能云CDN 七牛云CDN 金山云CDN 火山引擎CDN 传统CDN 网宿科技 蓝汛(ChinaCache) 运营商 中国移动 CDN 天翼云 CDN 联通 CDN ","wordCount":"113","inLanguage":"en","image":"https://skyduck-z.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E","datePublished":"2025-07-13T00:00:00Z","dateModified":"2025-07-13T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://skyduck-z.github.io/posts/2025-07-13-cdn/"},"publisher":{"@type":"Organization","name":"skyduck","logo":{"@type":"ImageObject","url":"https://skyduck-z.github.io/%3Clink%20/%20abs%20url%3E"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://skyduck-z.github.io/ accesskey=h title="首页 (Alt + H)"><img src=https://skyduck-z.github.io/apple-touch-icon.png alt aria-label=logo height=35>首页</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://skyduck-z.github.io/categories/ title=分类><span>分类</span></a></li><li><a href=https://skyduck-z.github.io/tags/ title=标签><span>标签</span></a></li><li><a href=https://skyduck-z.github.io/about_me title=关于我><span>关于我</span></a></li><li><a href=https://skyduck-z.github.io/about_space title=关于这里><span>关于这里</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://skyduck-z.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://skyduck-z.github.io/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">CDN</h1><div class=post-meta><span title='2025-07-13 00:00:00 +0000 UTC'>2025-07-13</span>&nbsp;·&nbsp;创建于:&nbsp;2025-07-13&nbsp;·&nbsp;1 min&nbsp;·&nbsp;113 words<div class=meta-item>&nbsp·&nbsp
+<a href=https://skyduck-z.github.io/categories/cs/>CS</a></div><div class=meta-item>&nbsp·&nbsp
+<a href=https://skyduck-z.github.io/tags/cs-other/>CS-Other</a>
+<span>,</span>
+<a href=https://skyduck-z.github.io/tags/2025/>2025</a></div></div></header><aside id=toc-container class="toc-container wide"><div class=toc><details open><summary accesskey=c title="(Alt + C)"><span class=details>目录</span></summary><div class=inner><ul><li><a href=#%e4%bb%80%e4%b9%88%e6%98%afcdn aria-label=什么是CDN>什么是CDN</a></li><li><a href=#cdn%e7%9a%84%e6%b5%81%e9%87%8f%e6%8e%a5%e5%85%a5 aria-label=CDN的流量接入>CDN的流量接入</a><ul><li><a href=#%e8%8a%82%e7%82%b9 aria-label=节点>节点</a><ul><li><a href=#l1%e8%be%b9%e7%bc%98%e8%8a%82%e7%82%b9 aria-label=L1(边缘节点)>L1(边缘节点)</a></li><li><a href=#l2 aria-label=L2>L2</a></li><li><a href=#l3 aria-label=L3>L3</a></li><li><a href=#%e6%ba%90%e7%ab%99 aria-label=源站>源站</a></li></ul></li></ul></li><li><a href=#%e7%bc%93%e5%ad%98 aria-label=缓存>缓存</a><ul><li><a href=#%e5%91%bd%e4%b8%ad%e7%8e%87%e5%9b%9e%e6%ba%90%e5%b8%a6%e5%ae%bd aria-label=命中率&回源带宽>命中率&回源带宽</a></li><li><a href=#%e5%ad%98%e5%82%a8%e6%a8%a1%e5%9e%8b aria-label=存储模型>存储模型</a></li><li><a href=#%e5%86%85%e5%ad%98%e6%b7%98%e6%b1%b0%e7%ae%97%e6%b3%95 aria-label=内存淘汰算法>内存淘汰算法</a></li></ul></li><li><a href=#%e8%b0%83%e5%ba%a6 aria-label=调度>调度</a><ul><li><a href=#dnsanycast aria-label=[DNS]&[Anycast]>[DNS]&[Anycast]</a></li><li><a href=#%e8%b5%84%e6%ba%90%e5%bb%ba%e8%ae%be%e8%b4%a8%e9%87%8f%e8%b0%83%e5%ba%a6%e6%88%90%e6%9c%ac%e8%b0%83%e5%ba%a6 aria-label=[资源建设]&[质量调度]&[成本调度]>[资源建设]&[质量调度]&[成本调度]</a><ul><li><a href=#%e8%b5%84%e6%ba%90%e5%bb%ba%e8%ae%be aria-label=资源建设>资源建设</a></li><li><a href=#%e8%b4%a8%e9%87%8f%e8%b0%83%e5%ba%a6 aria-label=质量调度>质量调度</a></li><li><a href=#%e6%88%90%e6%9c%ac%e8%b0%83%e5%ba%a6 aria-label=成本调度>成本调度</a></li></ul></li><li><a href=#%e5%9b%9e%e6%ba%90%e8%b0%83%e5%ba%a6 aria-label=[回源调度]>[回源调度]</a></li></ul></li><li><a href=#%e4%b8%9a%e5%8a%a1%e7%b1%bb%e5%9e%8b aria-label=业务类型>业务类型</a><ul><li><a href=#%e4%b8%8b%e8%bd%bd aria-label=下载>下载</a></li><li><a href=#%e7%82%b9%e6%92%ad aria-label=点播>点播</a><ul><li><a href=#%e6%b5%81%e5%aa%92%e4%bd%93%e4%bc%a0%e8%be%93 aria-label=流媒体传输>流媒体传输</a></li></ul></li><li><a href=#%e5%9b%be%e7%89%87 aria-label=图片>图片</a><ul><li><a href=#%e5%9b%be%e7%89%87%e5%a4%84%e7%90%86 aria-label=图片处理>图片处理</a></li></ul></li><li><a href=#%e7%9b%b4%e6%92%ad aria-label=直播>直播</a></li><li><a href=#%e5%8a%a8%e6%80%81 aria-label=动态>动态</a></li></ul></li><li><a href=#dcdn aria-label=DCDN>DCDN</a></li><li><a href=#%e5%89%8d%e6%b2%bf%e6%96%b9%e5%90%91 aria-label=前沿方向>前沿方向</a></li><li><a href=#%e8%a1%8c%e4%b8%9a aria-label=行业>行业</a><ul><li><a href=#%e7%ac%ac%e4%b8%89%e6%96%b9%e5%8e%82%e5%95%86 aria-label=第三方厂商>第三方厂商</a><ul><li><a href=#cdn77 aria-label=CDN77>CDN77</a></li><li><a href=#zenlayer aria-label=Zenlayer>Zenlayer</a></li><li><a href=#kpy aria-label=KPY>KPY</a></li></ul></li><li><a href=#%e6%b5%b7%e5%a4%96 aria-label=海外>海外</a><ul><li><a href=#akamai aria-label=Akamai>Akamai</a></li><li><a href=#cloudflare aria-label=Cloudflare>Cloudflare</a></li><li><a href=#amazon-cloudfrontaws aria-label="Amazon CloudFront(AWS)">Amazon CloudFront(AWS)</a></li><li><a href=#google-cloud-cdngcp aria-label="Google Cloud CDN(GCP)">Google Cloud CDN(GCP)</a></li><li><a href=#fastly aria-label=Fastly>Fastly</a></li></ul></li><li><a href=#%e5%9b%bd%e5%86%85 aria-label=国内>国内</a><ul><li><a href=#%e4%ba%91%e5%8e%82%e5%95%86 aria-label=云厂商>云厂商</a><ul><li><a href=#%e9%98%bf%e9%87%8c%e4%ba%91cdn aria-label=阿里云CDN>阿里云CDN</a></li><li><a href=#%e8%85%be%e8%ae%af%e4%ba%91cdn aria-label=腾讯云CDN>腾讯云CDN</a></li><li><a href=#%e5%8d%8e%e4%b8%ba%e4%ba%91cdn aria-label=华为云CDN>华为云CDN</a></li><li><a href=#%e7%99%be%e5%ba%a6%e6%99%ba%e8%83%bd%e4%ba%91cdn aria-label=百度智能云CDN>百度智能云CDN</a></li><li><a href=#%e4%b8%83%e7%89%9b%e4%ba%91cdn aria-label=七牛云CDN>七牛云CDN</a></li><li><a href=#%e9%87%91%e5%b1%b1%e4%ba%91cdn aria-label=金山云CDN>金山云CDN</a></li><li><a href=#%e7%81%ab%e5%b1%b1%e5%bc%95%e6%93%8ecdn aria-label=火山引擎CDN>火山引擎CDN</a></li></ul></li><li><a href=#%e4%bc%a0%e7%bb%9fcdn aria-label=传统CDN>传统CDN</a><ul><li><a href=#%e7%bd%91%e5%ae%bf%e7%a7%91%e6%8a%80 aria-label=网宿科技>网宿科技</a></li><li><a href=#%e8%93%9d%e6%b1%9bchinacache aria-label=蓝汛(ChinaCache)>蓝汛(ChinaCache)</a></li></ul></li><li><a href=#%e8%bf%90%e8%90%a5%e5%95%86 aria-label=运营商>运营商</a><ul><li><a href=#%e4%b8%ad%e5%9b%bd%e7%a7%bb%e5%8a%a8-cdn aria-label="中国移动 CDN">中国移动 CDN</a></li><li><a href=#%e5%a4%a9%e7%bf%bc%e4%ba%91-cdn aria-label="天翼云 CDN">天翼云 CDN</a></li><li><a href=#%e8%81%94%e9%80%9a-cdn aria-label="联通 CDN">联通 CDN</a></li></ul></li></ul></li></ul></li></ul></div></details></div></aside><script>let activeElement,elements;window.addEventListener("DOMContentLoaded",function(){checkTocPosition(),elements=document.querySelectorAll("h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]"),activeElement=elements[0];const t=encodeURI(activeElement.getAttribute("id")).toLowerCase();document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active")},!1),window.addEventListener("resize",function(){checkTocPosition()},!1),window.addEventListener("scroll",()=>{activeElement=Array.from(elements).find(e=>{if(getOffsetTop(e)-window.pageYOffset>0&&getOffsetTop(e)-window.pageYOffset<window.innerHeight/2)return e})||activeElement,elements.forEach(e=>{const t=encodeURI(e.getAttribute("id")).toLowerCase();e===activeElement?document.querySelector(`.inner ul li a[href="#${t}"]`).classList.add("active"):document.querySelector(`.inner ul li a[href="#${t}"]`).classList.remove("active")})},!1);const main=parseInt(getComputedStyle(document.body).getPropertyValue("--article-width"),10),toc=parseInt(getComputedStyle(document.body).getPropertyValue("--toc-width"),10),gap=parseInt(getComputedStyle(document.body).getPropertyValue("--gap"),10);function checkTocPosition(){const e=document.body.scrollWidth;e-main-toc*2-gap*4>0?document.getElementById("toc-container").classList.add("wide"):document.getElementById("toc-container").classList.remove("wide")}function getOffsetTop(e){if(!e.getClientRects().length)return 0;let t=e.getBoundingClientRect(),n=e.ownerDocument.defaultView;return t.top+n.pageYOffset}</script><div class=post-content><h1 id=什么是cdn>什么是CDN<a hidden class=anchor aria-hidden=true href=#什么是cdn>#</a></h1><p>CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层"智能分布式网络"</p><h1 id=cdn的流量接入>CDN的流量接入<a hidden class=anchor aria-hidden=true href=#cdn的流量接入>#</a></h1><h2 id=节点>节点<a hidden class=anchor aria-hidden=true href=#节点>#</a></h2><h3 id=l1边缘节点>L1(边缘节点)<a hidden class=anchor aria-hidden=true href=#l1边缘节点>#</a></h3><h3 id=l2>L2<a hidden class=anchor aria-hidden=true href=#l2>#</a></h3><h3 id=l3>L3<a hidden class=anchor aria-hidden=true href=#l3>#</a></h3><h3 id=源站>源站<a hidden class=anchor aria-hidden=true href=#源站>#</a></h3><h1 id=缓存>缓存<a hidden class=anchor aria-hidden=true href=#缓存>#</a></h1><h2 id=命中率回源带宽>命中率&回源带宽<a hidden class=anchor aria-hidden=true href=#命中率回源带宽>#</a></h2><h2 id=存储模型>存储模型<a hidden class=anchor aria-hidden=true href=#存储模型>#</a></h2><h2 id=内存淘汰算法>内存淘汰算法<a hidden class=anchor aria-hidden=true href=#内存淘汰算法>#</a></h2><h1 id=调度>调度<a hidden class=anchor aria-hidden=true href=#调度>#</a></h1><h2 id=dnsanycast>[DNS]&[Anycast]<a hidden class=anchor aria-hidden=true href=#dnsanycast>#</a></h2><h2 id=资源建设质量调度成本调度>[资源建设]&[质量调度]&[成本调度]<a hidden class=anchor aria-hidden=true href=#资源建设质量调度成本调度>#</a></h2><h3 id=资源建设>资源建设<a hidden class=anchor aria-hidden=true href=#资源建设>#</a></h3><ul><li>资源匹配<ul><li>就近接入，流量&容量匹配</li><li>按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配</li></ul></li></ul><h3 id=质量调度>质量调度<a hidden class=anchor aria-hidden=true href=#质量调度>#</a></h3><ul><li>探测系统<ul><li>外采：博睿等公司</li><li>自建拨测系统</li></ul></li><li>用户接入质量<ul><li>正向探测(客户端->接入ip)</li><li>反向探测(服务端->客户端)</li><li>质量信号维度<ul><li>运营商 -> 接入点(或ip粒度)：运营商可能有封ip行为</li><li>运营商 -> 接入点(或ip粒度)端口：运营商可能有封端口行为</li><li>省份(区域) -> 接入点(或ip粒度)</li><li>省份*运营商 -> 接入点(或ip粒度)</li><li>省份*运营商 -> 接入点(或ip粒度)端口</li><li>省份<em>运营商</em>HOST -> 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来</li><li>URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度</li></ul></li></ul></li></ul><h3 id=成本调度>成本调度<a hidden class=anchor aria-hidden=true href=#成本调度>#</a></h3><p>低价资源募集
+价差调度
+削峰填谷</p><h2 id=回源调度>[回源调度]<a hidden class=anchor aria-hidden=true href=#回源调度>#</a></h2><h1 id=业务类型>业务类型<a hidden class=anchor aria-hidden=true href=#业务类型>#</a></h1><h2 id=下载>下载<a hidden class=anchor aria-hidden=true href=#下载>#</a></h2><p>压缩
+小文件/大文件</p><h2 id=点播>点播<a hidden class=anchor aria-hidden=true href=#点播>#</a></h2><h3 id=流媒体传输>流媒体传输<a hidden class=anchor aria-hidden=true href=#流媒体传输>#</a></h3><p>切片(TS, Transport Stream)
+协议支持/优化：HLS,DASH,CMAF,FLV,RTMP</p><h2 id=图片>图片<a hidden class=anchor aria-hidden=true href=#图片>#</a></h2><h3 id=图片处理>图片处理<a hidden class=anchor aria-hidden=true href=#图片处理>#</a></h3><p>格式转换
+裁剪&缩放
+有损/无损压缩
+渐进式加载(模糊图->清晰图)
+图像特效处理：水印 亮度/对比度等参数调节 旋转 等等</p><h2 id=直播>直播<a hidden class=anchor aria-hidden=true href=#直播>#</a></h2><h2 id=动态>动态<a hidden class=anchor aria-hidden=true href=#动态>#</a></h2><h1 id=dcdn>DCDN<a hidden class=anchor aria-hidden=true href=#dcdn>#</a></h1><h1 id=前沿方向>前沿方向<a hidden class=anchor aria-hidden=true href=#前沿方向>#</a></h1><p>现在说到前沿一般都会联想到AI、大模型，CDN作为传统技术，大佬们都在做啥前沿探索？</p><h1 id=行业>行业<a hidden class=anchor aria-hidden=true href=#行业>#</a></h1><h2 id=第三方厂商>第三方厂商<a hidden class=anchor aria-hidden=true href=#第三方厂商>#</a></h2><p>这类公司提供的服务一般更接近基础网络建设/机房资源建设，目标客户群体也是最终的CDN服务提供商。</p><h3 id=cdn77>CDN77<a hidden class=anchor aria-hidden=true href=#cdn77>#</a></h3><h3 id=zenlayer>Zenlayer<a hidden class=anchor aria-hidden=true href=#zenlayer>#</a></h3><h3 id=kpy>KPY<a hidden class=anchor aria-hidden=true href=#kpy>#</a></h3><h2 id=海外>海外<a hidden class=anchor aria-hidden=true href=#海外>#</a></h2><h3 id=akamai>Akamai<a hidden class=anchor aria-hidden=true href=#akamai>#</a></h3><h3 id=cloudflare>Cloudflare<a hidden class=anchor aria-hidden=true href=#cloudflare>#</a></h3><h3 id=amazon-cloudfrontaws>Amazon CloudFront(AWS)<a hidden class=anchor aria-hidden=true href=#amazon-cloudfrontaws>#</a></h3><h3 id=google-cloud-cdngcp>Google Cloud CDN(GCP)<a hidden class=anchor aria-hidden=true href=#google-cloud-cdngcp>#</a></h3><h3 id=fastly>Fastly<a hidden class=anchor aria-hidden=true href=#fastly>#</a></h3><h2 id=国内>国内<a hidden class=anchor aria-hidden=true href=#国内>#</a></h2><h3 id=云厂商>云厂商<a hidden class=anchor aria-hidden=true href=#云厂商>#</a></h3><h4 id=阿里云cdn>阿里云CDN<a hidden class=anchor aria-hidden=true href=#阿里云cdn>#</a></h4><h4 id=腾讯云cdn>腾讯云CDN<a hidden class=anchor aria-hidden=true href=#腾讯云cdn>#</a></h4><h4 id=华为云cdn>华为云CDN<a hidden class=anchor aria-hidden=true href=#华为云cdn>#</a></h4><h4 id=百度智能云cdn>百度智能云CDN<a hidden class=anchor aria-hidden=true href=#百度智能云cdn>#</a></h4><h4 id=七牛云cdn>七牛云CDN<a hidden class=anchor aria-hidden=true href=#七牛云cdn>#</a></h4><h4 id=金山云cdn>金山云CDN<a hidden class=anchor aria-hidden=true href=#金山云cdn>#</a></h4><h4 id=火山引擎cdn>火山引擎CDN<a hidden class=anchor aria-hidden=true href=#火山引擎cdn>#</a></h4><h3 id=传统cdn>传统CDN<a hidden class=anchor aria-hidden=true href=#传统cdn>#</a></h3><h4 id=网宿科技>网宿科技<a hidden class=anchor aria-hidden=true href=#网宿科技>#</a></h4><h4 id=蓝汛chinacache>蓝汛(ChinaCache)<a hidden class=anchor aria-hidden=true href=#蓝汛chinacache>#</a></h4><h3 id=运营商>运营商<a hidden class=anchor aria-hidden=true href=#运营商>#</a></h3><h4 id=中国移动-cdn>中国移动 CDN<a hidden class=anchor aria-hidden=true href=#中国移动-cdn>#</a></h4><h4 id=天翼云-cdn>天翼云 CDN<a hidden class=anchor aria-hidden=true href=#天翼云-cdn>#</a></h4><h4 id=联通-cdn>联通 CDN<a hidden class=anchor aria-hidden=true href=#联通-cdn>#</a></h4></div><footer class=post-footer><ul class=post-tags><li><a href=https://skyduck-z.github.io/tags/cs-other/>CS-Other</a></li><li><a href=https://skyduck-z.github.io/tags/2025/>2025</a></li></ul><nav class=paginav><a class=prev href=https://skyduck-z.github.io/posts/2025-08-13-%E7%9B%AE%E6%A0%87%E7%AE%A1%E7%90%86%E6%B3%95/><span class=title>« Prev</span><br><span>目标管理法</span>
+</a><a class=next href=https://skyduck-z.github.io/posts/2025-07-13-%E6%80%8E%E4%B9%88%E5%81%9A%E6%8A%96%E9%9F%B3/><span class=title>Next »</span><br><span>怎么做抖音</span></a></nav></footer><script src=https://utteranc.es/client.js repo=skyduck-z/blog-comment issue-term=pathname label='💬 Comments' theme=github-light crossorigin=anonymous async></script></article></main><footer class=footer><span>&copy; 2026 <a href=https://skyduck-z.github.io/>skyduck</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$",right:"$",display:!1},{left:"$$",right:"$$",display:!0}],throwOnError:!1})})</script></body></html>
