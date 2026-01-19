@@ -11,8 +11,23 @@
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 21 Dec 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 12 Jan 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://skyduck-z.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>一封感谢信</title>
+      <link>https://skyduck-z.github.io/posts/2026-01-12-%E4%B8%80%E5%B0%81%E6%84%9F%E8%B0%A2%E4%BF%A1/</link>
+      <pubDate>Mon, 12 Jan 2026 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2026-01-12-%E4%B8%80%E5%B0%81%E6%84%9F%E8%B0%A2%E4%BF%A1/</guid>
+      <description>&lt;p&gt;尊敬的X老师,&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;首先，向你们表示衷心的感谢！感谢你们半年来对xx的细心照顾和热忱教导。
+
+我们知道，xx是个典型&amp;quot;困难生&amp;quot;，生理上脾胃虚弱+过敏性体质，心理上敏感i娃(遗传了)。刚上学的时候经历了很艰难的过渡期，但是好在，最近半年在你们的陪伴和培养下，情况有了很大的改善，他对上学这件事也是比较顺利的接纳了，他的语言表述、公开场合展示、与其他小朋友和谐相处以及分享这些方面也有了提升。很惭愧，父母应该是孩子的第一任老师，我们深刻认识到自己做的不到位，也更感激各位老师！
+
+老师们策划了很多积极有趣的学习活动，由于工作问题，很遗憾父母没有很充分的参加；最近由于睡觉时间晚和早晨需要追营养喝奶粉，迟到问题比较突出，在这里也跟各位老师抱歉。
+
+再次向老师们致以最诚挚的感谢！祝你们工作顺心，万事顺遂！
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
     <item>
       <title>拥抱AI(持续更新)</title>
       <link>https://skyduck-z.github.io/posts/2025-12-21-%E6%8B%A5%E6%8A%B1ai%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</link>
@@ -719,27 +734,77 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
       <link>https://skyduck-z.github.io/posts/2025-07-13-cdn/</link>
       <pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate>
       <guid>https://skyduck-z.github.io/posts/2025-07-13-cdn/</guid>
-      <description>&lt;h1 id=&#34;什么是cdn&#34;&gt;什么是CDN&lt;/h1&gt;
-&lt;p&gt;CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层&amp;quot;智能分布式网络&amp;quot;&lt;/p&gt;
+      <description>&lt;h2 id=&#34;古老的技术现代网络的底座从个人视角极简单的概述一下都需要做些啥&#34;&gt;古老的技术，现代网络的底座，从个人视角极简单的概述一下都需要做些啥。&lt;/h2&gt;
+&lt;h1 id=&#34;什么是cdn&#34;&gt;什么是CDN&lt;/h1&gt;
+&lt;p&gt;CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层&amp;quot;智能分布式网络&amp;quot;，将源站的内容(动态/静态)分发到靠近用户的边缘节点，缩短用户与“内容”之间的距离。&lt;/p&gt;
+&lt;p&gt;CDN的诞生？上世纪90年代Tim Berners - Lee提出了一个问题：“如何解决互联网内容分发效率”；MIT教授Tom Leighton与研究生Danny Lewin基于应用数学与算法研发了分布式网络传输技术，并创建了Akamai。&lt;/p&gt;
 &lt;h1 id=&#34;cdn的流量接入&#34;&gt;CDN的流量接入&lt;/h1&gt;
-&lt;h2 id=&#34;节点&#34;&gt;节点&lt;/h2&gt;
+&lt;p&gt;CDN网络的流量路径比较清晰，一般遵循&lt;code&gt;用户-&amp;gt;L1-&amp;gt;L2-&amp;gt;(Ln)-&amp;gt;源站&lt;/code&gt;的方式流动，服务端网络接入涉及很多细节(不展开讲)：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;物理层
+&lt;ul&gt;
+&lt;li&gt;PNI IXP Transit建设&lt;/li&gt;
+&lt;li&gt;BGP(anycast)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;协议层
+&lt;ul&gt;
+&lt;li&gt;TCP优化&lt;/li&gt;
+&lt;li&gt;UDP优化&lt;/li&gt;
+&lt;li&gt;QUIC&lt;/li&gt;
+&lt;li&gt;HTTP2 HTTP3&lt;/li&gt;
+&lt;li&gt;WebSocket优化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;控制层
+&lt;ul&gt;
+&lt;li&gt;4/7层负载均衡&lt;/li&gt;
+&lt;li&gt;分布式限流/限频&lt;/li&gt;
+&lt;li&gt;智能调度&lt;/li&gt;
+&lt;li&gt;长连接复用&lt;/li&gt;
+&lt;li&gt;端口复用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;安全
+&lt;ul&gt;
+&lt;li&gt;防火墙&lt;/li&gt;
+&lt;li&gt;DDos&lt;/li&gt;
+&lt;li&gt;WAF&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;cdn节点&#34;&gt;CDN节点&lt;/h2&gt;
+&lt;p&gt;CDN节点按层级一般部署L1-L3。&lt;/p&gt;
 &lt;h3 id=&#34;l1边缘节点&#34;&gt;L1(边缘节点)&lt;/h3&gt;
+&lt;p&gt;边缘节点，距离用户最近，处理用户请求。&lt;/p&gt;
 &lt;h3 id=&#34;l2&#34;&gt;L2&lt;/h3&gt;
+&lt;p&gt;一般是区域中心节点，区域内L1缓存miss时请求L2&lt;/p&gt;
 &lt;h3 id=&#34;l3&#34;&gt;L3&lt;/h3&gt;
+&lt;p&gt;一般是全局的核心节点/回源节点，拉取源站内容数据&lt;/p&gt;
 &lt;h3 id=&#34;源站&#34;&gt;源站&lt;/h3&gt;
+&lt;p&gt;内容生产者，源站一般会通过ip白名单等手段控制CDN服务访问&lt;/p&gt;
 &lt;h1 id=&#34;缓存&#34;&gt;缓存&lt;/h1&gt;
+&lt;p&gt;作为内容分发的灵魂，缓存模块一般是CDN服务器最核心的服务，一台完整的CDN边缘服务器可以围绕核心的缓存服务逐层向外拆解。&lt;/p&gt;
 &lt;h2 id=&#34;命中率回源带宽&#34;&gt;命中率&amp;amp;回源带宽&lt;/h2&gt;
+&lt;p&gt;L1命中率 L2命中率 回源智能调度(故障[链路故障/节点故障/源站故障]规避 回源带宽成本规划)&lt;/p&gt;
 &lt;h2 id=&#34;存储模型&#34;&gt;存储模型&lt;/h2&gt;
+&lt;p&gt;结合业务特性，cpu/gpu/内存/磁盘合理的搭配，提升资源利用率&lt;/p&gt;
 &lt;h2 id=&#34;内存淘汰算法&#34;&gt;内存淘汰算法&lt;/h2&gt;
+&lt;p&gt;比较成熟的研究方向，合适的淘汰算法能够帮助提升命中率，节约机器成本和带宽成本&lt;/p&gt;
 &lt;h1 id=&#34;调度&#34;&gt;调度&lt;/h1&gt;
-&lt;h2 id=&#34;dnsanycast&#34;&gt;[DNS]&amp;amp;[Anycast]&lt;/h2&gt;
+&lt;h2 id=&#34;用户-l1调度&#34;&gt;用户-&amp;gt;L1调度&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;DNS:使用最广泛的基于DNS系统的智能调度系统，一般按 计算系统-&amp;gt;服务提供商权威服务器-&amp;gt;运营商local DNS-&amp;gt;用户 路径生效&lt;/li&gt;
+&lt;li&gt;HTTPDNS: 不再依赖运营商local DNS(基于DNS调度的一切问题几乎都来源于不可控的local DNS)，并且能够做到请求粒度的调度，更加可控&lt;/li&gt;
+&lt;li&gt;Anycast: 基于BGP协议构建anycast接入网络，相比于unicast，更灵活&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h2 id=&#34;资源建设质量调度成本调度&#34;&gt;[资源建设]&amp;amp;[质量调度]&amp;amp;[成本调度]&lt;/h2&gt;
 &lt;h3 id=&#34;资源建设&#34;&gt;资源建设&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;资源匹配
 &lt;ul&gt;
 &lt;li&gt;就近接入，流量&amp;amp;容量匹配&lt;/li&gt;
-&lt;li&gt;按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配&lt;/li&gt;
+&lt;li&gt;按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡] 内存 gpu)与业务流量特性匹配&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
@@ -748,7 +813,11 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
 &lt;li&gt;探测系统
 &lt;ul&gt;
 &lt;li&gt;外采：博睿等公司&lt;/li&gt;
-&lt;li&gt;自建拨测系统&lt;/li&gt;
+&lt;li&gt;自建：探测资源采购部署 数据回传/配置下发链路搭建 数据汇聚&amp;amp;存储&amp;amp;分析
+&lt;ul&gt;
+&lt;li&gt;核心问题：准确性 时效性 (准确性和时效性之间需要做trade-off)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;用户接入质量
@@ -770,25 +839,13 @@ PS: 我觉得能够把以上步骤执行好就已经很棒了
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&#34;成本调度&#34;&gt;成本调度&lt;/h3&gt;
-&lt;p&gt;低价资源募集
-价差调度
-削峰填谷&lt;/p&gt;
-&lt;h2 id=&#34;回源调度&#34;&gt;[回源调度]&lt;/h2&gt;
-&lt;h1 id=&#34;业务类型&#34;&gt;业务类型&lt;/h1&gt;
-&lt;h2 id=&#34;下载&#34;&gt;下载&lt;/h2&gt;
-&lt;p&gt;压缩
-小文件/大文件&lt;/p&gt;
-&lt;h2 id=&#34;点播&#34;&gt;点播&lt;/h2&gt;
-&lt;h3 id=&#34;流媒体传输&#34;&gt;流媒体传输&lt;/h3&gt;
-&lt;p&gt;切片(TS, Transport Stream)
-协议支持/优化：HLS,DASH,CMAF,FLV,RTMP&lt;/p&gt;
-&lt;h2 id=&#34;图片&#34;&gt;图片&lt;/h2&gt;
-&lt;h3 id=&#34;图片处理&#34;&gt;图片处理&lt;/h3&gt;
-&lt;p&gt;格式转换
-裁剪&amp;amp;缩放
-有损/无损压缩
-渐进式加载(模糊图-&amp;gt;清晰图)
-图像特效处理：水印 亮度/对比度等参数调节 旋转 等等&lt;/p&gt;</description>
+&lt;ul&gt;
+&lt;li&gt;低价资源募集&lt;/li&gt;
+&lt;li&gt;价差调度&lt;/li&gt;
+&lt;li&gt;削峰填谷&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;l1-l2-ln调度&#34;&gt;L1-&amp;gt;L2-&amp;gt;Ln调度&lt;/h2&gt;
+&lt;p&gt;这部分网络大部分是服务提供商自建或者可控的，做好网络优化和选路&lt;/p&gt;</description>
     </item>
     <item>
       <title>怎么做抖音</title>

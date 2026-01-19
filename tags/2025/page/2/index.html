@@ -15,12 +15,20 @@ M（Measurable）：可衡量 目标需有量化标准，便于跟踪进度和�
 A（Achievable）：可实现 目标需具有挑战性，但在现有资源（时间、能力、预算等）下可达成，避免因目标过高而失去动力，或过低而缺乏意义。 反面示例：“零基础 1 个月内成为 AI 专家”（资源和时间不匹配，难以实现）。 正面示例：“3 个月内通过系统学习，掌握 Python 基础编程并独立完成一个数据分析项目”（结合现有基础和学习路径，可实现）。
 R（Relevant）：相关性 目标需与个人 / 团队的核心目标、长期愿景相关联，确保资源投入有价值，避免偏离核心方向。 反面示例：“市场部花大量时间学习财务软件”（与市场部核心职责关联度低）。 正面示例：“市场部学习新媒体运营工具，提升短视频内容曝光量”（直接服务于 “扩大品牌影响力” 的核心目标）。
 T（Time-bound）：有时限 目标必须设定明确的完成时间，避免无限期拖延，同时便于规划阶段任务。 反面示例：“完成产品迭代”（无时间限制，易导致进度松散）。 正面示例：“在 2024 年 12 月 31 日前完成 V2.0 版本的功能开发并上线”（明确截止时间，可拆分阶段任务）。
-...</p></div><footer class=entry-footer><span title='2025-08-13 00:00:00 +0000 UTC'>2025-08-13</span>&nbsp;·&nbsp;创建于:&nbsp;2025-08-13&nbsp;·&nbsp;1 min&nbsp;·&nbsp;73 words</footer><a class=entry-link aria-label="post link to 目标管理法" href=https://skyduck-z.github.io/posts/2025-08-13-%E7%9B%AE%E6%A0%87%E7%AE%A1%E7%90%86%E6%B3%95/></a></article><article class="post-entry tag-entry"><header class=entry-header><h2 class=entry-hint-parent>CDN</h2></header><div class=entry-content><p>什么是CDN CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层"智能分布式网络"
-CDN的流量接入 节点 L1(边缘节点) L2 L3 源站 缓存 命中率&回源带宽 存储模型 内存淘汰算法 调度 [DNS]&[Anycast] [资源建设]&[质量调度]&[成本调度] 资源建设 资源匹配 就近接入，流量&容量匹配 按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡])与业务流量匹配 质量调度 探测系统 外采：博睿等公司 自建拨测系统 用户接入质量 正向探测(客户端->接入ip) 反向探测(服务端->客户端) 质量信号维度 运营商 -> 接入点(或ip粒度)：运营商可能有封ip行为 运营商 -> 接入点(或ip粒度)端口：运营商可能有封端口行为 省份(区域) -> 接入点(或ip粒度) 省份*运营商 -> 接入点(或ip粒度) 省份*运营商 -> 接入点(或ip粒度)端口 省份运营商HOST -> 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来 URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度 成本调度 低价资源募集 价差调度 削峰填谷
-[回源调度] 业务类型 下载 压缩 小文件/大文件
-点播 流媒体传输 切片(TS, Transport Stream) 协议支持/优化：HLS,DASH,CMAF,FLV,RTMP
-图片 图片处理 格式转换 裁剪&缩放 有损/无损压缩 渐进式加载(模糊图->清晰图) 图像特效处理：水印 亮度/对比度等参数调节 旋转 等等
-...</p></div><footer class=entry-footer><span title='2025-07-13 00:00:00 +0000 UTC'>2025-07-13</span>&nbsp;·&nbsp;创建于:&nbsp;2025-07-13&nbsp;·&nbsp;1 min&nbsp;·&nbsp;113 words</footer><a class=entry-link aria-label="post link to CDN" href=https://skyduck-z.github.io/posts/2025-07-13-cdn/></a></article><article class="post-entry tag-entry"><header class=entry-header><h2 class=entry-hint-parent>怎么做抖音</h2></header><div class=entry-content><p>前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?” 听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。
+...</p></div><footer class=entry-footer><span title='2025-08-13 00:00:00 +0000 UTC'>2025-08-13</span>&nbsp;·&nbsp;创建于:&nbsp;2025-08-13&nbsp;·&nbsp;1 min&nbsp;·&nbsp;73 words</footer><a class=entry-link aria-label="post link to 目标管理法" href=https://skyduck-z.github.io/posts/2025-08-13-%E7%9B%AE%E6%A0%87%E7%AE%A1%E7%90%86%E6%B3%95/></a></article><article class="post-entry tag-entry"><header class=entry-header><h2 class=entry-hint-parent>CDN</h2></header><div class=entry-content><p>古老的技术，现代网络的底座，从个人视角极简单的概述一下都需要做些啥。 什么是CDN CDN，Content Delivery Network，内容分发网络，是构建在基础网络之上的一层"智能分布式网络"，将源站的内容(动态/静态)分发到靠近用户的边缘节点，缩短用户与“内容”之间的距离。
+CDN的诞生？上世纪90年代Tim Berners - Lee提出了一个问题：“如何解决互联网内容分发效率”；MIT教授Tom Leighton与研究生Danny Lewin基于应用数学与算法研发了分布式网络传输技术，并创建了Akamai。
+CDN的流量接入 CDN网络的流量路径比较清晰，一般遵循用户->L1->L2->(Ln)->源站的方式流动，服务端网络接入涉及很多细节(不展开讲)：
+物理层 PNI IXP Transit建设 BGP(anycast) 协议层 TCP优化 UDP优化 QUIC HTTP2 HTTP3 WebSocket优化 控制层 4/7层负载均衡 分布式限流/限频 智能调度 长连接复用 端口复用 安全 防火墙 DDos WAF CDN节点 CDN节点按层级一般部署L1-L3。
+L1(边缘节点) 边缘节点，距离用户最近，处理用户请求。
+L2 一般是区域中心节点，区域内L1缓存miss时请求L2
+L3 一般是全局的核心节点/回源节点，拉取源站内容数据
+源站 内容生产者，源站一般会通过ip白名单等手段控制CDN服务访问
+缓存 作为内容分发的灵魂，缓存模块一般是CDN服务器最核心的服务，一台完整的CDN边缘服务器可以围绕核心的缓存服务逐层向外拆解。
+命中率&回源带宽 L1命中率 L2命中率 回源智能调度(故障[链路故障/节点故障/源站故障]规避 回源带宽成本规划)
+存储模型 结合业务特性，cpu/gpu/内存/磁盘合理的搭配，提升资源利用率
+内存淘汰算法 比较成熟的研究方向，合适的淘汰算法能够帮助提升命中率，节约机器成本和带宽成本
+调度 用户->L1调度 DNS:使用最广泛的基于DNS系统的智能调度系统，一般按 计算系统->服务提供商权威服务器->运营商local DNS->用户 路径生效 HTTPDNS: 不再依赖运营商local DNS(基于DNS调度的一切问题几乎都来源于不可控的local DNS)，并且能够做到请求粒度的调度，更加可控 Anycast: 基于BGP协议构建anycast接入网络，相比于unicast，更灵活 [资源建设]&[质量调度]&[成本调度] 资源建设 资源匹配 就近接入，流量&容量匹配 按业务类型隔离，服务器资源(qps[cpu] 带宽[网卡] 内存 gpu)与业务流量特性匹配 质量调度 探测系统 外采：博睿等公司 自建：探测资源采购部署 数据回传/配置下发链路搭建 数据汇聚&存储&分析 核心问题：准确性 时效性 (准确性和时效性之间需要做trade-off) 用户接入质量 正向探测(客户端->接入ip) 反向探测(服务端->客户端) 质量信号维度 运营商 -> 接入点(或ip粒度)：运营商可能有封ip行为 运营商 -> 接入点(或ip粒度)端口：运营商可能有封端口行为 省份(区域) -> 接入点(或ip粒度) 省份*运营商 -> 接入点(或ip粒度) 省份*运营商 -> 接入点(或ip粒度)端口 省份运营商HOST -> 接入点(或ip粒度)：七层业务探测，特定HOST质量分析，一般由业务侧客户端/服务端数据生产而来 URL?业界目前还没这么细的质量需求，调度上一般也做不到这么细粒度的调度 成本调度 低价资源募集 价差调度 削峰填谷 L1->L2->Ln调度 这部分网络大部分是服务提供商自建或者可控的，做好网络优化和选路
+...</p></div><footer class=entry-footer><span title='2025-07-13 00:00:00 +0000 UTC'>2025-07-13</span>&nbsp;·&nbsp;创建于:&nbsp;2025-07-13&nbsp;·&nbsp;1 min&nbsp;·&nbsp;178 words</footer><a class=entry-link aria-label="post link to CDN" href=https://skyduck-z.github.io/posts/2025-07-13-cdn/></a></article><article class="post-entry tag-entry"><header class=entry-header><h2 class=entry-hint-parent>怎么做抖音</h2></header><div class=entry-content><p>前段时间面试被提问到，“如果要你做抖音这个产品,你都要考虑哪些技术问题?” 听到这个问题就脑袋瓜子嗡嗡的，我能大概明白这个问题的点(知识面宽度加相关领域深度?)，但是实在是回答的一塌糊涂，今天有充足的时间，再回头来慢慢思考总结下吧。
 分几个方向浅浅来看下吧：
 前端 后端 网络 存储 算法 安全合规 生态 1. 前端 这里的前端，语义上主要指用户使用产品的入口，包括有 各类移动端、PC端、浏览器、H5、头部应用生态集成(例如微信小程序)等，这里为了美观、易用、流畅、轻量，可以做大量的工作，不了解，不展开讲
 2. 后端 技术栈庞大实在储备不足，随便写两句
