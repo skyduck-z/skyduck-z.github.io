@@ -28,6 +28,55 @@
       <description>&lt;p&gt;TBD.&lt;/p&gt;</description>
     </item>
     <item>
+      <title>go synctest</title>
+      <link>https://skyduck-z.github.io/posts/2025-10-18-go-synctest/</link>
+      <pubDate>Sat, 18 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/posts/2025-10-18-go-synctest/</guid>
+      <description>&lt;p&gt;长期以来，异步逻辑的单测都令人十分的头疼，我们一般通过使用sleep来碰运气，但是sleep又会面临一个问题，就是简单的单测耗时却大量增加，而且脱离本地环境在容器环境编译时，cpu调度不上，这简直就是灾难。&lt;/p&gt;
+&lt;p&gt;救星来啦，&lt;code&gt;testing/synctest&lt;/code&gt;包终于来了(1.25版本)。&lt;/p&gt;
+&lt;p&gt;有两个方法，&lt;code&gt;synctest.Test&lt;/code&gt; 和 &lt;code&gt;synctest.Wait&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;在&lt;code&gt;synctest.Test&lt;/code&gt;里，时间是假的，可以理解为，这里面的逻辑，梳理好先后顺序后则按顺序执行，中间的等待时间全部被跳过了。如下的例子，这里不会真的sleep一个小时，测试函数可以瞬间完成。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func TestXXX(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		time.Sleep(time.Hour)
+		fmt.Println(&amp;#34;synctest sleep done&amp;#34;)
+	})
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;synctest.Wait&lt;/code&gt;则能够帮助等待此前的所有goroutine都进入稳定状态(要么执行完要么阻塞住？)。如下的例子，routine1 routine2都执行完毕，routine3阻塞在sleep，才继续执行&lt;code&gt;synctest.Wait()&lt;/code&gt;之后的逻辑。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;func TestXXX(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		fmt.Println(&amp;#34;start&amp;#34;)
+		go func() {
+			fmt.Println(&amp;#34;goroutine 1 start&amp;#34;)
+			fmt.Println(&amp;#34;goroutine 1 done&amp;#34;)
+		}()
+		go func() {
+			fmt.Println(&amp;#34;goroutine 2 start&amp;#34;)
+			fmt.Println(&amp;#34;goroutine 2 done&amp;#34;)
+		}()
+		go func() {
+			fmt.Println(&amp;#34;goroutine 3 start&amp;#34;)
+			time.Sleep(time.Second)
+			fmt.Println(&amp;#34;goroutine 3 done&amp;#34;)
+		}()
+		synctest.Wait()
+		fmt.Println(&amp;#34;end&amp;#34;)
+		time.Sleep(time.Second * 2)
+	})
+}
+
+输出：
+start
+goroutine 3 start
+goroutine 1 start
+goroutine 1 done
+goroutine 2 start
+goroutine 2 done
+end
+goroutine 3 done
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    <item>
       <title>CDN</title>
       <link>https://skyduck-z.github.io/posts/2025-07-13-cdn/</link>
       <pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate>

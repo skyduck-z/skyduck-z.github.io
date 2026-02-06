@@ -79,13 +79,13 @@
       &lt;/tr&gt;
       &lt;tr&gt;
           &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;KR2:读5本金融/经济相关书籍&lt;/td&gt;
+          &lt;td&gt;KR2:读书(经济/金融,毛选,王阳明)&lt;/td&gt;
           &lt;td&gt;□□□□□□□□□□&lt;/td&gt;
           &lt;td&gt;&lt;/td&gt;
       &lt;/tr&gt;
       &lt;tr&gt;
           &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;KR3:中国历史知识系统梳理&lt;/td&gt;
+          &lt;td&gt;KR3:中国历史知识系统学习梳理&lt;/td&gt;
           &lt;td&gt;□□□□□□□□□□&lt;/td&gt;
           &lt;td&gt;&lt;/td&gt;
       &lt;/tr&gt;
@@ -139,7 +139,7 @@
       &lt;/tr&gt;
       &lt;tr&gt;
           &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;KR2:形成系统 学会思考&lt;/td&gt;
+          &lt;td&gt;KR2:形成系统 开始按系统执行动作并记录总结&lt;/td&gt;
           &lt;td&gt;□□□□□□□□□□&lt;/td&gt;
           &lt;td&gt;&lt;/td&gt;
       &lt;/tr&gt;
@@ -325,6 +325,11 @@
       &lt;/tr&gt;
       &lt;tr&gt;
           &lt;td&gt;House&lt;/td&gt;
+          &lt;td&gt;Life-Note&lt;/td&gt;
+          &lt;td&gt;关于房&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Life-Other&lt;/td&gt;
           &lt;td&gt;Life-Note&lt;/td&gt;
           &lt;td&gt;关于房&lt;/td&gt;
       &lt;/tr&gt;
