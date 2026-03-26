@@ -11,8 +11,15 @@
     </image>
     <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 23 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 28 Feb 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://skyduck-z.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Anything</title>
+      <link>https://skyduck-z.github.io/categories/anything/</link>
+      <pubDate>Sat, 28 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://skyduck-z.github.io/categories/anything/</guid>
+      <description></description>
+    </item>
     <item>
       <title>History</title>
       <link>https://skyduck-z.github.io/categories/history/</link>
@@ -39,13 +46,6 @@
       <link>https://skyduck-z.github.io/categories/read/</link>
       <pubDate>Wed, 21 Jan 2026 00:00:00 +0000</pubDate>
       <guid>https://skyduck-z.github.io/categories/read/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Anything</title>
-      <link>https://skyduck-z.github.io/categories/anything/</link>
-      <pubDate>Mon, 12 Jan 2026 00:00:00 +0000</pubDate>
-      <guid>https://skyduck-z.github.io/categories/anything/</guid>
       <description></description>
     </item>
     <item>
