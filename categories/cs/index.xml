@@ -107,11 +107,67 @@
 &lt;p&gt;查询：&lt;/p&gt;</description>
     </item>
     <item>
-      <title>GMP温故知新</title>
-      <link>https://skyduck-z.github.io/posts/2025-12-20-gmp%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</link>
+      <title>Go温故知新</title>
+      <link>https://skyduck-z.github.io/posts/2025-12-20-go%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</link>
       <pubDate>Sat, 20 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>https://skyduck-z.github.io/posts/2025-12-20-gmp%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</guid>
-      <description>&lt;p&gt;TBD.&lt;/p&gt;</description>
+      <guid>https://skyduck-z.github.io/posts/2025-12-20-go%E6%B8%A9%E6%95%85%E7%9F%A5%E6%96%B0/</guid>
+      <description>&lt;h1 id=&#34;gmp&#34;&gt;GMP&lt;/h1&gt;
+&lt;h2 id=&#34;线程thread协程coroutine&#34;&gt;线程(thread)&amp;amp;协程(coroutine)&lt;/h2&gt;
+&lt;p&gt;&lt;img alt=&#34;thread&amp;amp;coroutine&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/gmp/thread_and_coroutine.png&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;线程：是操作系统内核视角下的最小调度单元，内核参与其 创建/销毁/切换/调度 等过程&lt;/li&gt;
+&lt;li&gt;协程：也称为用户态线程，是用户程序对线程概念的二次封装，多个协程对应一个线程，在逻辑上是更细粒度的调度单元(相比于线程)，其生命周期在用户态闭环完成，内核不参与&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;协程coroutinegoroutine&#34;&gt;协程(coroutine)&amp;amp;goroutine&lt;/h2&gt;
+&lt;p&gt;&lt;img alt=&#34;thread&amp;amp;goroutine&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/gmp/thread_and_goroutine.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;goroutine是golang对协程的本土化实现和改进。goroutine本身是依附于GMP(goroutine-machine-processor)体系而存在的，GMP架构下的goroutine相比于原生协程有如下优势：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;g 与 p、m 之间可以动态结合，整个调度过程有着很高的灵活性&lt;/li&gt;
+&lt;li&gt;g 栈空间大小可以动态扩缩，既能做到使用方便，也尽可能地节约了资源&lt;/li&gt;
+&lt;li&gt;GMP体系下 golang 完全屏蔽了线程的概念，golang的并发都以 g 为并发粒度，做到了 “书同文、车同轨”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;gmp-1&#34;&gt;GMP&lt;/h2&gt;
+&lt;p&gt;GMP = goroutine + machine + processor&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;GMP&#34; loading=&#34;lazy&#34; src=&#34;https://skyduck-z.github.io/images/gmp/gmp.png&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;g&#34;&gt;g&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;g=goroutine，是 golang 中对协程的抽象&lt;/li&gt;
+&lt;li&gt;g 有自己的运行栈、生命周期状态、以及执行的任务函数（用户通过 go func 指定）&lt;/li&gt;
+&lt;li&gt;g 需要绑定在 m 上执行，在 g 视角中，可以将 m 理解为它的 cpu&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;m&#34;&gt;m&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;m=machine，是 golang 中对线程的抽象&lt;/li&gt;
+&lt;li&gt;m 需要和 p 进行结合，从而进入到 GMP 调度体系之中&lt;/li&gt;
+&lt;li&gt;m 的运行目标始终在 g0 和 g 之间进行切换; 当运行 g0 时执行的是 m 的调度流程，负责寻找合适的“任务”，也就是 g；当运行 g 时，执行的是 m 获取到的”任务“，也就是用户通过 go func 启动的 goroutine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;p&#34;&gt;p&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;p=processor，是 golang 中的调度器&lt;/li&gt;
+&lt;li&gt;p 可以理解为 m 的执行代理，m 需要与 p 绑定后，才会进入到 GMP 调度模式当中；因此 p 的数量决定了 g 最大并行数量（可由用户通过 GOMAXPROCS 进行设定，在超过 CPU 核数时无意义）&lt;/li&gt;
+&lt;li&gt;p 是 g 的存储容器，其自带一个本地 g 队列（local run queue，简称 lrq），承载着一系列等待被调度的 g
+&lt;code&gt;PS: 这里可以看到p是GMP体系中的掮客，g是任务，m是机器，p把任务和干活的机器匹配到一起把活给干掉&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;g的容器&#34;&gt;g的容器&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;lrq(local run queue): p的本地队列，通常由 p 自行访问，并发竞争情况较少，因此设计为无锁化结构，通过CAS(compare-and-swap)操作访问; 当 m 与 p 结合后，不论是创建 g 还是获取 g，都优先从私有的 lrq 中获取，从而尽可能减少并发竞争行为; 并发情况较少，但并非完全没有，还可能存在来自其他 p 的窃取行为&lt;/li&gt;
+&lt;li&gt;grq(global run queue): 全局队列，是全局调度模块 schedt 中的全局共享 g 队列，作为当某个 lrq 不满足条件时的备用容器，因为不同的 m 都可能访问 grq，因此并发竞争比较激烈，访问前需要加全局锁&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;g的存入和取出&#34;&gt;g的存入和取出&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;put g: 当某个 g 中通过&lt;code&gt;go func(){...}&lt;/code&gt;操作创建子 g 时，会先尝试将子 g 添加到当前所在 p 的 lrq 中，如果 lrq 满了，则会将 g 追加到 grq 中&lt;/li&gt;
+&lt;li&gt;get g: GMP 调度流程中，m 和 p 结合后，运行的 g0 会不断寻找合适的 g 用于执行，此时会采取“负载均衡”的思路
+&lt;ul&gt;
+&lt;li&gt;优先从当前 p 的 lrq 中获取 g(无锁化-CAS)&lt;/li&gt;
+&lt;li&gt;从全局的 grq 中获取 g(全局锁)&lt;/li&gt;
+&lt;li&gt;取 io 就绪的 g(netpoll 机制)&lt;/li&gt;
+&lt;li&gt;从其他 p 的 lrq 中窃取 g(无锁化-CAS)
+&lt;code&gt;在 get g 流程中，在 g0 每经过 61 次调度循环后，下一次会在处理 lrq 前优先处理一次 grq，避免因 lrq 过于忙碌而致使 grq 陷入饥荒状态&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;golang内存管理&#34;&gt;Golang内存管理&lt;/h1&gt;
+&lt;h1 id=&#34;golang垃圾回收&#34;&gt;Golang垃圾回收&lt;/h1&gt;</description>
     </item>
     <item>
       <title>go synctest</title>
